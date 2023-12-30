@@ -54,7 +54,7 @@ app.use(session({
 	cookie: {
 		secure: false,
 		httpOnly: true,
-		maxAge: 5 * 60 * 1000,
+		maxAge: 15 * 60 * 1000,
 	}
 }));
 app.use(flash());

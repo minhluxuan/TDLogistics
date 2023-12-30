@@ -15,7 +15,7 @@ const pool = mysql.createPool(dbOptions).promise();
 
 const createOTP = async (phoneNumber, email, otp) => {
     let expiration = new Date();
-    expiration.setMinutes(expiration.getMinutes() + 59);
+    expiration.setMinutes(expiration.getMinutes() + 5);
     expiration = moment(expiration).format("YYYY-MM-DD HH:mm:ss");
 
     const query = `INSERT INTO ${table} (email, phone_number, otp, expiration) VALUES (?, ?, ?, ?)`;

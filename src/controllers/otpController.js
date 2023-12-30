@@ -27,8 +27,15 @@ const createOTP = async (req, res) => {
         const mailOptions = {
             from: "Dịch vụ chuyển phát nhanh TDLogistics",
             to: email,
-            subject: "Xác thực OTP của bạn",
-            text: `<p>Mã OTP của bạn là <strong>${otp}</strong></p>`,
+            subject: "Xác thực OTP cho ứng dụng TDLogistics",
+            html: `<p>OTP của quý khách là:<br><br>
+            <strong style="font-size: 20px; color: red;">${otp}</strong>
+            <br><br>
+            Quý khách vui lòng không tiết lộ OTP cho bất kỳ ai. OTP sẽ hết hạn sau 5 phút nữa.
+            <br><br>
+            Xin cảm ơn quý khách,<br>
+            Đội ngũ kỹ thuật TDLogistics.
+            </p>`,
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
