@@ -7,7 +7,7 @@ const findOne = async (pool, table, fields, values) => {
         return result[0];
     } catch (error) {
         console.log("Error: ", error);
-        throw "Lỗi cơ sở dữ liệu!";
+        throw "Đã xảy ra lỗi. Vui lòng thử lại sau ít phút!";
     }
 }
 
@@ -27,18 +27,19 @@ const find = async (pool, table, fields = null, values = null) => {
         return result[0];
     } catch (error) {
         console.log("Error: ", error);
-        throw "Lỗi cơ sở dữ liệu!";
+        throw "Đã xảy ra lỗi. Vui lòng thử lại sau ít phút!";
     }
 }
 
 const insert = async (pool, table, fields, values) => {
     const query = `INSERT INTO ${table} (${fields.map(field => `${field}`)}) VALUES (${fields.map(field => `?`)})`;
+    
     try {
         const result = await pool.query(query, values);
         return result;
     } catch (error) {
         console.log("Error: ", error);
-        throw "Lỗi cơ sở dữ liệu!";
+        throw "Đã xảy ra lỗi. Vui lòng thử lại sau ít phút!";
     }
 }
 
@@ -53,7 +54,24 @@ const update = async (pool, table, fields, values, conditionFields, conditionVal
         return result;
     } catch (error) {
         console.log("Error: ", error);
-        throw "Lỗi cơ sở dữ liệu!";
+        throw "Đã xảy ra lỗi. Vui lòng thử lại sau ít phút!";
+    }
+}
+
+const getLastRow = async (pool, table) => {
+    const query = `SELECT * FROM ?? ORDER BY id DESC LIMIT 1`;
+    
+    try {
+        const result = await pool.query(query, [table]);
+        
+        if (result.length > 0) {
+            return result[0][0];
+        }
+        
+        return null;
+    } catch (error) {
+        console.log("Error: ", error);
+        throw "Đã xảy ra lỗi. Vui lòng thử lại sau ít phút!";
     }
 }
 
@@ -62,4 +80,5 @@ module.exports = {
     find,
     insert,
     update,
+    getLastRow,
 }

@@ -1,13 +1,12 @@
 const mysql = require("mysql2");
 const moment = require("moment");
-const utils = require("./utils");
 
 const dbOptions = {
-    host: "sql12.freemysqlhosting.net",
-    port: 3306,
-    user: "sql12672558",
-    password: "mnsK6vV9Hg",
-    database: "sql12672558",
+    host: process.env.HOST,
+    port: process.env.DBPORT,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
 };
 
 const table = "otp";
@@ -15,7 +14,7 @@ const table = "otp";
 const pool = mysql.createPool(dbOptions).promise();
 
 const createOTP = async (phoneNumber, email, otp) => {
-    var expiration = new Date();
+    let expiration = new Date();
     expiration.setMinutes(expiration.getMinutes() + 59);
     expiration = moment(expiration).format("YYYY-MM-DD HH:mm:ss");
 
@@ -31,15 +30,15 @@ const createOTP = async (phoneNumber, email, otp) => {
 };
 
 const verifyOTP = async (phoneNumber, otp) => {
-    var currentTime = new Date();
+    let currentTime = new Date();
     currentTime = moment(currentTime).format("YYYY-MM-DD HH:mm:ss");
 
     const query = `SELECT * FROM ${table} WHERE phone_number = ? AND otp = ? AND expiration > ?`;
 
     try {
-        const [rows, fields] = await pool.query(query, [phoneNumber, otp, currentTime]);
+        const result = await pool.query(query, [phoneNumber, otp, currentTime]);
         
-        const isValidOTP = Array.isArray(rows) && rows.length > 0;
+        const isValidOTP = Array.isArray(result[0]) && result[0].length > 0;
         console.log(isValidOTP ? "Valid OTP" : "Invalid OTP");
         return isValidOTP;
     } catch (error) {

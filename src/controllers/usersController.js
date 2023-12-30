@@ -1,13 +1,13 @@
-// const passport = require("passport");
 const usersService = require("../services/usersService");
-const utils = require("./utils");
+const dotenv = require("dotenv").config({ path: "../../.env" });
+
+const REGEX_NAME = new RegExp(process.env.REGEX_NAME);
+const REGEX_EMAIL = new RegExp(process.env.REGEX_EMAIL);
+const REGEX_PHONE_NUMBER = new RegExp(process.env.REGEX_PHONE_NUMBER);
 
 const checkExistUser = async (req, res) => {
-    const { phone_number } = req.body;
-    
     try {
-        const existed = await usersService.checkExistUser(phone_number);
-
+        const existed = await usersService.checkExistUser(req.body["phone_number"]);
         return res.status(200).json({
             error: false,
             existed: existed,
@@ -31,10 +31,6 @@ const createNewUser = async (req, res) => {
 
     const { fullname, email, phone_number } = req.body;
 
-    const REGEX_NAME = /^([a-vxyỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ]+)((\s{1}[a-vxyỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ]+){1,})$/;
-    const REGEX_EMAIL = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,4}$/;
-    const REGEX_PHONE_NUMBER = /^[0-9]{1,10}/;
-
     if (!REGEX_NAME.test(fullname.toLowerCase()) || !REGEX_EMAIL.test(email) || !REGEX_PHONE_NUMBER.test(phone_number) || phone_number !== req.user.phone_number) {
         return res.status(400).json({
             error: true,
@@ -42,7 +38,7 @@ const createNewUser = async (req, res) => {
         });
     }
 
-    if (checkExistUser(phone_number)) {
+    if (await usersService.checkExistUser(phone_number)) {
         return res.status(400).json({
             error: true,
             message: "Số điện thoại đã tồn tại!",
@@ -51,13 +47,10 @@ const createNewUser = async (req, res) => {
 
     try {
         const newUser = {
-            userId: await utils.hashPhoneNumber(phone_number),
             fullname: fullname,
             email: email,
             phoneNumber: phone_number,
         }
-
-        console.log(newUser.userId);
 
         await usersService.createNewUser(newUser);
         return res.status(200).json({
@@ -145,11 +138,7 @@ const updateUserInfo = async (req, res) => {
         });
     }
 
-    const REGEX_NAME = /^([a-vxyỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ]+)((\s{1}[a-vxyỳọáầảấờễàạằệếýộậốũứĩõúữịỗìềểẩớặòùồợãụủíỹắẫựỉỏừỷởóéửỵẳẹèẽổẵẻỡơôưăêâđ]+){1,})$/;
-    const REGEX_EMAIL = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,4}$/;
-    const REGEX_PHONE_NUMBER = /^[0-9]{1,10}/;
-
-    if (!req.body.hasOwnProperty("phone_number") || !req.body["phone_number"] || !REGEX_PHONE_NUMBER.test(req.body["phone_number"]) || phone_number !== req.user.phone_number) {
+    if (!req.body.hasOwnProperty("phone_number") || !req.body["phone_number"] || !REGEX_PHONE_NUMBER.test(req.body["phone_number"]) || req.body["phone_number"] !== req.user.phone_number) {
         console.log("Phone number cannot be empty!");
         return res.status(400).json({
             error: true,

@@ -1,12 +1,13 @@
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
+const dotenv = require("dotenv").config();
 const otpService = require("../services/otpService");
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "minhfaptv@gmail.com",
-        pass: "zuko cgyk uvfj lfnt",
+        user: process.env.MAIL_AUTH_USER,
+        pass: process.env.MAIL_AUTH_PASSWORD,
     }
 });
 
@@ -16,21 +17,23 @@ const createOTP = async (req, res) => {
     const otp = randomstring.generate({
         length: 6,
         charset: "numeric",
+        min: 100000,
+        max: 999999,
     });
 
     try {
         await otpService.createOTP(phone_number, email, otp);
 
         const mailOptions = {
-            from: "minhfaptv@gmail.com",
+            from: "Dịch vụ chuyển phát nhanh TDLogistics",
             to: email,
             subject: "Xác thực OTP của bạn",
-            text: `Mã OTP của bạn là ${otp}`,
+            text: `<p>Mã OTP của bạn là <strong>${otp}</strong></p>`,
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
             if (err) {
-                return res.status(500).send("Đã xảy ra lỗi. Vui lòng thử lại.");
+                return res.status(500).send("Đã xảy ra lỗi. Vui lòng thử lại sau ít phút.");
             }
 
             return res.status(200).send("OTP được gửi thành công. Vui lòng kiểm tra số điện thoại và email để xác thực.");
@@ -38,7 +41,7 @@ const createOTP = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             error: true,
-            message: "Lỗi hệ thống. Vui lòng thử lại!",
+            message: "Đã xảy ra lỗi. Vui lòng thử lại sau ít phút.",
         });
     }
 }

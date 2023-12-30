@@ -3,21 +3,32 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const nodemailer = require('nodemailer');
-const randomstring = require('randomstring');
 const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
+const mysql = require("mysql2");
+const cron = require("cron");
+const cors = require("cors");
 const flash = require("express-flash");
 const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
-const JWTStrategy = require("passport-jwt").Strategy;
-const ExtractStrategy = require("passport-jwt").ExtractJwt;
-const store = session.MemoryStore();
+const dotenv = require("dotenv");
+dotenv.config();
+
 
 const indexRouter = require('./routes/index');
-// const usersRouter = require('./routes/users');
 const usersRouter = require("./src/routes/usersRoute");
 const otpRouter = require("./src/routes/otpRoute");
-const utils = require("./utils");
+
+
+const dbOptions = {
+	host: process.env.HOST,
+	port: process.env.DBPORT,
+	user: process.env.USER,
+	password: process.env.PASSWORD,
+	database: process.env.DATABASE,
+};
+const pool = mysql.createPool(dbOptions);
+  
+const sessionStore = new MySQLStore({}, pool);
 
 const app = express();
 
@@ -25,16 +36,21 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+app.use(cors({
+	origin: "http://localhost", // add another in the future
+	methods: "POST, GET, PUT, PATCH, DELETE",
+	credentials: true,
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-	secret: "your-secret",
+	secret: "da85#t*$as-t+&ru^c7t5u!r~e%a?nd89a+lg@o91r$i%t#hm",
 	resave: false,
 	saveUninitialized: false,
-	store: store,
+	store: sessionStore,
 	cookie: {
 		secure: false,
 		httpOnly: true,
@@ -42,7 +58,6 @@ app.use(session({
 	}
 }));
 app.use(flash());
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -65,5 +80,17 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+const cleanUpExpiredSession = new cron.CronJob("0 */12 * * *", async () => {
+	try {
+		const currentTime = new Date();
+		await sessionStore.clearExpiredSessions(currentTime);
+		console.log("Expired sessions has been cleared successfully!");
+	} catch (err) {
+	  	console.log("Error cleaning up expired session: ", err);
+	}
+});
+  
+cleanUpExpiredSession.start();
 
 module.exports = app;

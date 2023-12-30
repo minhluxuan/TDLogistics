@@ -2,11 +2,11 @@ const mysql = require("mysql2");
 const utils = require("./utils");
 
 const dbOptions = {
-    host: "sql12.freemysqlhosting.net",
-    port: 3306,
-    user: "sql12672558",
-    password: "mnsK6vV9Hg",
-    database: "sql12672558",
+    host: process.env.HOST,
+    port: process.env.DBPORT,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
 };
 
 const table = "customer_user";
@@ -19,7 +19,15 @@ const checkExistUser = async (phoneNumber) => {
 };
 
 const createNewUser = async (newUser) => {
-    const { userId, fullname, email, phoneNumber } = newUser;
+    const lastUser = await utils.getLastRow(pool, table);
+
+    let userId = "000000000";
+
+    if (lastUser) {
+        userId = (parseInt(lastUser["user_id"]) + 1).toString().padStart(9, "0");
+    }
+
+    const { fullname, email, phoneNumber } = newUser;
     await utils.insert(pool, table, ["user_id", "fullname", "email", "phone"], [userId, fullname, email, phoneNumber]);
 }
 

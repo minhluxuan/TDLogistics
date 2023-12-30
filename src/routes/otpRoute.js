@@ -11,7 +11,6 @@ const sessionStrategy = new LocalStrategy({
     passwordField: "otp",
 }, async (phone_number, otp, done) => {
     const valid = await otpController.verifyOTPMiddleware(phone_number, otp);
-
     if (!valid) {
         return done(null, false);
     }
@@ -26,36 +25,17 @@ const sessionStrategy = new LocalStrategy({
 
 passport.use(sessionStrategy);
 
-router.post("/send-otp", otpController.createOTP);
-router.post("/verify-otp", passport.authenticate("local", {
-    failureRedirect: "/api/v1/otp/otp-fail",
-    successRedirect: "/api/v1/otp/otp-success",
+router.post("/send_otp", otpController.createOTP);
+router.post("/verify_otp", passport.authenticate("local", {
+    failureRedirect: "/api/v1/otp/otp_fail",
+    successRedirect: "/api/v1/otp/otp_success",
     failureFlash: true,
 }), otpController.verifyOTPSuccess);
-router.get("/otp-fail", otpController.verifyOTPFail);
-router.get("/otp-success", otpController.verifyOTPSuccess);
-router.get("/get-user", (req, res) => {
-    if (req.isAuthenticated()) {
-        return res.status(200).json({
-            error: false,
-            user: {
-                phone_number: req.user.phone_number,
-                permission: req.user.permission,
-            },
-            message: "Lấy thông tin thành công!", 
-        });
-    }
-
-    return res.status(401).json({
-        error: true,
-        user: undefined,
-        message: "Bạn không được cấp quyền truy cập vào tài nguyên này!"
-    });
-});
+router.get("/otp_fail", otpController.verifyOTPFail);
+router.get("/otp_success", otpController.verifyOTPSuccess);
 
 passport.serializeUser(utils.setSession);
 passport.deserializeUser((user, done) => {
-    console.log(user);
     utils.verifyPermission(user, done);
 });
 

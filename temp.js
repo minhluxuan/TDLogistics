@@ -63,8 +63,6 @@ app.get("/send-otp", (req, res) => {
 app.post("/verify-otp", (req, res) => {
   const { email, otp } = req.body;
 
-  console.log(otpMap);
-
   const storedOtp = otpMap.get(email);
 
   if (!storedOtp || storedOtp !== otp) {
