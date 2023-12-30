@@ -1,0 +1,24 @@
+POST http://localhost:5000/api/v1/otp/send-otp
+content-type: application/json
+
+{
+    "phone_number": "0981430418",
+    "email": "minh.luxuanhcmut@hcmut.edu.vn"
+}
+
+
+###
+
+POST http://localhost:5000/api/v1/otp/verify-otp
+content-type: application/json
+
+{
+    "phone_number": "0981430418",
+    "email": "minh.luxuanhcmut@hcmut.edu.vn",
+    "otp": "815559"
+}
+
+###
+
+GET http://localhost:5000/api/v1/users
+Accept: application/json
