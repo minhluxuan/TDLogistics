@@ -206,7 +206,9 @@ const logout = async (req, res) => {
   }
     
   const sessionId = req.cookies["connect.sid"];
-  if (!sessionId) {
+  const existed = usersService.checkExistSession(sessionId);
+    
+  if (!existed) {
    return res.sendStatus(204).json({
       error: true,
       message: "Vui lòng đăng nhập.",
