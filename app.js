@@ -12,8 +12,6 @@ const flash = require("express-flash");
 const passport = require("passport");
 const dotenv = require("dotenv");
 dotenv.config();
-//to restart render.com
-const trash = 1000;
 
 const indexRouter = require('./routes/index');
 const usersRouter = require("./src/routes/usersRoute");
