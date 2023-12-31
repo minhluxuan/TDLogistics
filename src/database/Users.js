@@ -10,6 +10,7 @@ const dbOptions = {
 };
 
 const table = "customer_user";
+const sessionTable="sessions";
 
 const pool = mysql.createPool(dbOptions).promise();
 
@@ -43,10 +44,16 @@ const updateUserInfo = async (fields, values, conditionFields, conditionValues) 
     await utils.update(pool, table, fields, values, conditionFields, conditionValues);
 }
 
+const checkExistSession = async (sessionId) => {
+  const result = await utils.findOne(pool, sessionTable, ["session_id"], [sessionId]);
+  return result.length > 0;
+};
+
 module.exports = {
     checkExistUser,
     createNewUser,
     getAllUsers,
     getUser,
     updateUserInfo,
+    checkExistSession,
 }

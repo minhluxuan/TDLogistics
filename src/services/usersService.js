@@ -20,10 +20,16 @@ const updateUserInfo = async (fields, values, conditionFields, conditionValues) 
     await Users.updateUserInfo(fields, values, conditionFields, conditionValues);
 }
 
+const checkExistSession = async (sessionId) => {
+ return await Users.checkExistSession(sessionId);
+};
+
+
 module.exports = {
     checkExistUser,
     createNewUser,
     getAllUsers,
     getUser,
     updateUserInfo,
+    checkExistSession,
 }

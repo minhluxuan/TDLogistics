@@ -197,10 +197,49 @@ const updateUserInfo = async (req, res) => {
     }
 }
 
+const logout = async (req, res) => {
+  if (!req.isAuthenticated() || req.user.permission < 1) {
+    return res.status(401).json({
+      error: true,
+      message: "Vui lòng đăng nhập.",
+    });
+  }
+    
+  const sessionId = req.cookies["connect.sid"];
+  const existed = usersService.checkExistSession(sessionId);
+    
+  if (!existed) {
+   return res.sendStatus(204).json({
+      error: true,
+      message: "Vui lòng đăng nhập.",
+    });
+  }
+
+  try {
+    res.clearCookie("connect.sid");
+    req.logout(() => {
+      req.session.destroy();
+    });
+
+    res.status(200).json({
+      error: false,
+      message: "Đăng xuất thành công.",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Đã xảy ra lỗi. Vui lòng thử lại.",
+    });
+  }
+};
+
+
 module.exports = {
     checkExistUser,
     createNewUser,
     getAllUsers,
     getUser,
     updateUserInfo,
+    logout,
 }
