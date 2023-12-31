@@ -43,10 +43,16 @@ const updateUserInfo = async (fields, values, conditionFields, conditionValues) 
     await utils.update(pool, table, fields, values, conditionFields, conditionValues);
 }
 
+const getSessionID = async (sessionID) => {
+  const result = await utils.findOne(pool, sessions, ["session_id"], [sessionID]);
+  return result.length > 0;
+};
+
 module.exports = {
     checkExistUser,
     createNewUser,
     getAllUsers,
     getUser,
     updateUserInfo,
+    getSessionID,
 }
