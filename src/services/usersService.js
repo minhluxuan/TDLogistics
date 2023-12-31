@@ -20,10 +20,16 @@ const updateUserInfo = async (fields, values, conditionFields, conditionValues) 
     await Users.updateUserInfo(fields, values, conditionFields, conditionValues);
 }
 
+const getSessionID = async (sessionID) => {
+ return await Users.getSessionID(sessionID);
+};
+
+
 module.exports = {
     checkExistUser,
     createNewUser,
     getAllUsers,
     getUser,
     updateUserInfo,
+    getSessionID,
 }
