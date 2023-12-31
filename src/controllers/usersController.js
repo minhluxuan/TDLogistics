@@ -203,27 +203,16 @@ const logout = async (req, res) => {
       error: true,
       message: "Vui lòng đăng nhập.",
     });
-    // return res.redirect("/");
   }
-  const authHeader = req.headers["cookie"]; //check cookie exist
-  if (!authHeader) {
+    
+  const sessionId = req.cookies["connect.sid"];
+  if (!sessionId) {
    return res.sendStatus(204).json({
       error: true,
       message: "Vui lòng đăng nhập.",
     });
-    // return res.redirect("/");
   }
-  const session_id = authHeader.split("=")[1]; 
 
-  const sessionID = usersService.getSessionID(session_id); //check sessionID exist
-
-  if (!sessionID) {
-   return res.sendStatus(204).json({
-      error: true,
-      message: "Vui lòng đăng nhập.",
-    });
-    // return res.redirect("/");
-  }
   try {
     res.clearCookie("connect.sid");
     req.logout(() => {
@@ -232,14 +221,13 @@ const logout = async (req, res) => {
 
     res.status(200).json({
       error: false,
-      message: "Bạn đã đăng xuất",
+      message: "Đăng xuất thành công.",
     });
-    // res.redirect('/');
 
   } catch (error) {
     res.status(500).json({
       status: "error",
-      message: "Lỗi Sever",
+      message: "Đã xảy ra lỗi. Vui lòng thử lại.",
     });
   }
 };
