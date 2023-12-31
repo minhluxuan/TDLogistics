@@ -10,6 +10,7 @@ const dbOptions = {
 };
 
 const table = "customer_user";
+const sessionTable="sessions";
 
 const pool = mysql.createPool(dbOptions).promise();
 
@@ -44,7 +45,7 @@ const updateUserInfo = async (fields, values, conditionFields, conditionValues) 
 }
 
 const getSessionID = async (sessionID) => {
-  const result = await utils.findOne(pool, sessions, ["session_id"], [sessionID]);
+  const result = await utils.findOne(pool, sessionTable, ["session_id"], [sessionID]);
   return result.length > 0;
 };
 
