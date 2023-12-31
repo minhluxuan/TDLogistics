@@ -199,30 +199,30 @@ const updateUserInfo = async (req, res) => {
 
 const logout = async (req, res) => {
   if (!req.isAuthenticated() || req.user.permission < 1) {
-    res.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Vui lòng đăng nhập.",
     });
-    return res.redirect("/");
+    // return res.redirect("/");
   }
   const authHeader = req.headers["cookie"]; //check cookie exist
   if (!authHeader) {
-    res.sendStatus(204).json({
+   return res.sendStatus(204).json({
       error: true,
       message: "Vui lòng đăng nhập.",
     });
-    return res.redirect("/");
+    // return res.redirect("/");
   }
   const session_id = authHeader.split("=")[1]; 
 
   const sessionID = usersService.getSessionID(session_id); //check sessionID exist
 
   if (!sessionID) {
-    res.sendStatus(204).json({
+   return res.sendStatus(204).json({
       error: true,
       message: "Vui lòng đăng nhập.",
     });
-    return res.redirect("/");
+    // return res.redirect("/");
   }
   try {
     res.clearCookie("connect.sid");
@@ -234,7 +234,7 @@ const logout = async (req, res) => {
       error: false,
       message: "Bạn đã đăng xuất",
     });
-    res.redirect('/');
+    // res.redirect('/');
 
   } catch (error) {
     res.status(500).json({
