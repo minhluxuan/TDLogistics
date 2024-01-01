@@ -35,7 +35,11 @@ router.post("/verify_otp", passport.authenticate("local", {
 }), otpController.verifyOTPSuccess);
 router.get("/otp_fail", otpController.verifyOTPFail);
 router.get("/otp_success", otpController.verifyOTPSuccess);
-
+router.post("/test", (req, res) => {
+    console.log(req.body.phone_number);
+    console.log(req.body.otp);
+}
+            
 passport.serializeUser(utils.setSession);
 passport.deserializeUser((user, done) => {
     utils.verifyPermission(user, done);
