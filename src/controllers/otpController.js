@@ -63,6 +63,7 @@ const verifyOTPFail = (req, res) => {
         valid: false,
         message: "OTP không hợp lệ. Vui lòng thử lại!",
         otp: req.body.phone_number,
+        number: 456,
     });
 }
 
@@ -72,6 +73,7 @@ const verifyOTPSuccess = (req, res) => {
         valid: true,
         message: "Xác thực thành công!",
         otp: req.body.phone_number,
+        number: 123,
     });
 }
 
