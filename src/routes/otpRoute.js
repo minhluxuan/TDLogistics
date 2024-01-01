@@ -38,7 +38,7 @@ router.get("/otp_success", otpController.verifyOTPSuccess);
 router.post("/test", (req, res) => {
     console.log(req.body.phone_number);
     console.log(req.body.otp);
-}
+});
             
 passport.serializeUser(utils.setSession);
 passport.deserializeUser((user, done) => {
