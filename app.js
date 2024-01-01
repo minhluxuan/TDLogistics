@@ -35,11 +35,7 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(cors({
-	origin: "http://localhost", // add another in the future
-	methods: "POST, GET, PUT, PATCH, DELETE",
-	credentials: true,
-}));
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
