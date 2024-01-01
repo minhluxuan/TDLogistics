@@ -54,7 +54,8 @@ const createOTP = async (req, res) => {
 }
 
 const verifyOTPMiddleware = async (phone_number, otp) => {
-    console.log(phone_number, otp); //
+    console.log(phone_number);
+    console.log(otp);
     return await otpService.verifyOTP(phone_number, otp);
 }
 
