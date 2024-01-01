@@ -10,6 +10,8 @@ const sessionStrategy = new LocalStrategy({
     usernameField: "phone_number",
     passwordField: "otp",
 }, async (phone_number, otp, done) => {
+    console.log(phone_number);
+    console.log(otp);
     const valid = await otpController.verifyOTPMiddleware(phone_number, otp);
     if (!valid) {
         return done(null, false);
