@@ -35,7 +35,7 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.enable('trust proxy');
+// app.enable('trust proxy');
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
@@ -49,7 +49,7 @@ app.use(session({
 	store: sessionStore,
 	cookie: {
 		secure: true,
-		sameSite: 'none',
+		sameSite: 'None',
 		maxAge: 15 * 60 * 1000,
 	}
 }));
