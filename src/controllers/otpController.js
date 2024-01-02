@@ -54,22 +54,30 @@ const createOTP = async (req, res) => {
 }
 
 const verifyOTPMiddleware = async (phone_number, otp) => {
+    console.log(phone_number);
+    console.log(otp);
     return await otpService.verifyOTP(phone_number, otp);
 }
 
 const verifyOTPFail = (req, res) => {
-    return res.status(400).json({
-        error: false,
+    return res.status(200).json({
+        // error: false,
         valid: false,
-        message: "OTP không hợp lệ. Vui lòng thử lại!",
+        // message: "OTP không hợp lệ. Vui lòng thử lại!",
+        // otp: req.user.phone_number,
+        // session: req.session,
+        // number: 456,
     });
 }
 
 const verifyOTPSuccess = (req, res) => {
     return res.status(200).json({
-        error: false,
+        // error: false,
         valid: true,
-        message: "Xác thực thành công!",
+        // message: "Xác thực thành công!",
+        // otp: req.user.phone_number,
+        // session: req.session,
+        // number: 123,
     });
 }
 
