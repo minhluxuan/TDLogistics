@@ -198,6 +198,7 @@ const updateUserInfo = async (req, res) => {
 }
 
 const logout = async (req, res) => {
+  console.log(req.session);
   if (!req.isAuthenticated() || req.user.permission < 1) {
     return res.status(401).json({
       error: true,
