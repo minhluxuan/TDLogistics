@@ -16,7 +16,7 @@ dotenv.config();
 const indexRouter = require('./routes/index');
 const usersRouter = require("./src/routes/usersRoute");
 const otpRouter = require("./src/routes/otpRoute");
-
+const ordersRouter = require("./src/routes/ordersRoute");
 
 const dbOptions = {
 	host: process.env.HOST,
@@ -63,6 +63,7 @@ app.use(passport.session());
 app.use('/', indexRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/otp", otpRouter);
+app.use("/api/v1/orders", ordersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
