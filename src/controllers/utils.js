@@ -12,7 +12,7 @@ const hashPhoneNumber = async (phoneNumber) => {
 const validateCreatingOrder = (data) => {
     const schema = Joi.object({
         order_id: Joi.string().alphanum().min(5).max(15).required(),
-        user_id: Joi.string().alphanum().min(6).max(6).required(),
+        user_id: Joi.string().alphanum().min(6).max(6),
         order_time: Joi.date(),
         mass: Joi.number().precision(2).min(0).required(),
         height: Joi.number().precision(2).min(0).required(),
@@ -25,7 +25,7 @@ const validateCreatingOrder = (data) => {
         parent: Joi.string().alphanum().min(6).max(6),
         container: Joi.string().alphanum().min(6).max(6),
         journey: Joi.string().alphanum(),
-        COD: Joi.number().precision(3).min(0).required(),
+        COD: Joi.number().precision(3).min(0),
         status_success: Joi.boolean(),
         miss: Joi.number().min(0).max(3),
     });
@@ -36,7 +36,7 @@ const validateCreatingOrder = (data) => {
 const validateFindingOrder = (data) => {
     const schema = Joi.object({
         order_id: Joi.string().alphanum().min(5).max(15),
-        user_id: Joi.string().alphanum().min(6).max(6).required(),
+        user_id: Joi.string().alphanum().min(6).max(6),
         order_time: Joi.date(),
         start_mass: Joi.number().precision(2).min(0),
         end_mass: Joi.number().precision(2).min(0),
@@ -55,7 +55,7 @@ const validateFindingOrder = (data) => {
         parent: Joi.string().alphanum().min(6).max(6),
         container: Joi.string().alphanum().min(6).max(6),
         journey: Joi.string().alphanum(),
-        COD: Joi.number().precision(3).min(0).required(),
+        COD: Joi.number().precision(3).min(0),
         status_success: Joi.boolean(),
         miss: Joi.number().min(0).max(3),
     });
@@ -66,12 +66,12 @@ const validateFindingOrder = (data) => {
 const validateUpdatingOrder = (data) => {
     const schema = Joi.object({
         order_id: Joi.string().alphanum().min(5).max(15).required(),
-        user_id: Joi.string().alphanum().min(6).max(6).required(),
+        user_id: Joi.string().alphanum().min(6).max(6),
         order_time: Joi.date(),
-        mass: Joi.number().precision(2).min(0).required(),
-        height: Joi.number().precision(2).min(0).required(),
-        width: Joi.number().precision(2).min(0).required(),
-        length: Joi.number().precision(2).min(0).required(),
+        mass: Joi.number().precision(2).min(0),
+        height: Joi.number().precision(2).min(0),
+        width: Joi.number().precision(2).min(0),
+        length: Joi.number().precision(2).min(0),
         long_source: Joi.number().min(-180).max(180),
         lat_source: Joi.number().min(-90).max(90),
         long_destination: Joi.number().min(-180).max(180),
@@ -79,7 +79,7 @@ const validateUpdatingOrder = (data) => {
         parent: Joi.string().alphanum().min(6).max(6),
         container: Joi.string().alphanum().min(6).max(6),
         journey: Joi.string().alphanum(),
-        COD: Joi.number().precision(3).min(0).required(),
+        COD: Joi.number().precision(3).min(0),
         status_success: Joi.boolean(),
         miss: Joi.number().min(0).max(3),
     });
