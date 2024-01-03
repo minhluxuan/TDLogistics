@@ -1,17 +1,17 @@
-const mysql = require("mysql");
-//const moment = require("moment");
+const mysql = require("mysql2");
 const utils = require("./utils");
-
-const connection = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "admin",
-  database: "UserDatabase",
-});
+const dbOptions = {
+  host: "db4free.net",
+  user: "demotdlogistic1",
+  password: "demotdlogistic1",
+  port: 3306,
+  database: "demotdlogistic1",
+};
 
 const table = "orders";
+const sessionTable = "sessions";
 
-const pool = mysql.createPool(connection);
+const pool = mysql.createPool(dbOptions).promise();
 
 const updateOrder = async (
   fields,
@@ -28,14 +28,11 @@ const updateOrder = async (
       conditionFields,
       conditionValues
     );
-    console.log(result);
   } catch (error) {
     console.error(error);
-    console.log("error");
-    // Handle the error appropriately
   }
 };
 
-updateOrder(["mass"], ["2"], ["id"], ["1"]);
+//updateOrder(["mass"], [2], ["id"], [1]);
 
-//module.exports = { updateOrder };
+module.exports = { updateOrder };
