@@ -3,4 +3,6 @@ const ordersController = require("../controllers/ordersController");
 
 const router = express.Router();
 
-router.patch("/", ordersController.updateUserOrder);
+router.patch("/:order_id", ordersController.updateUserOrder);
+
+module.exports = router;
