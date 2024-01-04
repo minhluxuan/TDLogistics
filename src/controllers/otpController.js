@@ -15,10 +15,10 @@ const createOTP = async (req, res) => {
     const { phone_number, email } = req.body;
 
     const otp = randomstring.generate({
-        length: 6,
+        length: 4,
         charset: "numeric",
-        min: 100000,
-        max: 999999,
+        min: 1000,
+        max: 9999,
     });
 
     try {
