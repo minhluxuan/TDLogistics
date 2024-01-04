@@ -22,7 +22,7 @@ const createOTP = async (req, res) => {
     });
 
     try {
-        await otpService.createOTP(phone_number, email, otp);
+        await otpService.createOTP(phone_number, otp);
 
         const mailOptions = {
             from: "Dịch vụ chuyển phát nhanh TDLogistics",
