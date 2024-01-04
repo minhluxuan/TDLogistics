@@ -20,7 +20,7 @@ const createOTP = async (phoneNumber, email, otp) => {
     expires = moment(expiration).format("YYYY-MM-DD HH:mm:ss");
 
     try {
-        await utils.insert(pool, table, ["email", "phone_number", "otp", "expires"], [email, phoneNumber, otp, expiration]);
+        await utils.insert(pool, table, ["phone_number", "otp", "expires"], [phoneNumber, otp, expiration]);
     } catch (error) {
         console.error("Error: ", error);
         throw "Lỗi cơ sở dữ liệu. Vui lòng thử lại!";
