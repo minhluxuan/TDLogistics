@@ -14,7 +14,7 @@ const table = "otp";
 
 const pool = mysql.createPool(dbOptions).promise();
 
-const createOTP = async (phoneNumber, email, otp) => {
+const createOTP = async (phoneNumber, otp) => {
     let expiration = new Date();
     expiration.setMinutes(expiration.getMinutes() + 5);
     expires = moment(expiration).format("YYYY-MM-DD HH:mm:ss");
