@@ -2,10 +2,6 @@ const crypto = require("crypto");
 const Joi = require("joi");
 require("dotenv").config();
 
-const Joi = require("joi");
-require("dotenv").config();
-
-
 const hashPhoneNumber = async (phoneNumber) => {
     const hash = crypto.createHash("sha256");
     hash.update(phoneNumber);
