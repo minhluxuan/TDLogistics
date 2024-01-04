@@ -90,7 +90,7 @@ const createNewOrder = async (req, res) => {
             message: "Bạn không được phép truy cập tài nguyên này.",
         });
     }
-    const userRequestValidation = new utils.UserRequestValidation(req.body);
+    const userRequestValidation = new utils.CustomerUserRequestValidation(req.body);
 
     const { error } = userRequestValidation.validateCreatingOrder();
 

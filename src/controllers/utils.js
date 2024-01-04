@@ -12,7 +12,7 @@ const hashPhoneNumber = async (phoneNumber) => {
     return hash.digest("hex");
 }
 
-class UserRequestValidation {
+class CustomerUserRequestValidation {
     constructor(data) {
         this._data = data;
     }
@@ -94,5 +94,5 @@ class UserRequestValidation {
 
 module.exports = {
     hashPhoneNumber,
-    UserRequestValidation,
+    CustomerUserRequestValidation,
 }
