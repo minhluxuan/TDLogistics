@@ -12,8 +12,13 @@ const getOrder = async (fields, values) => {
     return await Orders.getOrder(fields, values);
 };
 
+const createNewOrder = async (fields, values) => {
+    return await Orders.createNewOrder(fields, values);
+}
+
 module.exports = {
     checkExistOrder,
     getAllOrders,
     getOrder,
+    createNewOrder,
 };

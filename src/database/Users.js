@@ -36,6 +36,10 @@ const getAllUsers = async () => {
     return await utils.find(pool, table);
 }
 
+const getOneUser = async (fields, values) => {
+    return await utils.findOne(pool, table, fields, values);
+}
+
 const getUser = async (fields, values) => {
     return await utils.find(pool, table, fields, values);
 }
@@ -54,6 +58,7 @@ module.exports = {
     createNewUser,
     getAllUsers,
     getUser,
+    getOneUser,
     updateUserInfo,
     checkExistSession,
 }

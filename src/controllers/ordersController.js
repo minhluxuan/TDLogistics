@@ -1,4 +1,5 @@
 const ordersService = require("../services/ordersService");
+const utils = require("./utils");
 
 const checkExistOrder = async (req, res) => {
     try {
@@ -16,7 +17,6 @@ const checkExistOrder = async (req, res) => {
         });
     }
 }
-
 
 const getAllOrders = async (req, res) => {
     if(!req.isAuthenticated() || req.user.permission < 1) {
@@ -81,11 +81,59 @@ const getOrder = async (req, res) => {
             message: error,
         });
     }
+}
 
+const createNewOrder = async (req, res) => {
+    if(!req.isAuthenticated() || req.user.permisson < 1) {
+        return res.status(401).json({
+            error: true,
+            message: "Bạn không được phép truy cập tài nguyên này.",
+        });
+    }
+
+    const { error } = utils.validateCreatingOrder(req.body);
+
+    if (error) {
+        return res.status(400).json({
+            error: true,
+            message: "Thông tin không hợp lệ!",
+        });
+    }
+
+    const keys = new Array();
+    const values = new Array();
+
+    for (const key in req.body) {
+        keys.push(key);
+        values.push(req.body[key]);
+    }
+
+    keys.push("user_id");
+    keys.push("fee");
+    keys.push("COD");
+    values.push("00000009");
+    values.push(23000);
+    values.push(124000);
+
+    try {
+        const result = await ordersService.createNewOrder(keys, values);
+        
+        console.log(result);
+        return res.status(200).json({
+            error: false,
+            message: "Tạo đơn hàng thành công.",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: error,
+        });
+    }
 }
 
 module.exports = {
     checkExistOrder,
     getAllOrders,
     getOrder,
+    createNewOrder,
 }

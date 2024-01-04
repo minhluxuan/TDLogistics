@@ -3,6 +3,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const otpController = require("../controllers/otpController");
 const utils = require("../../utils");
+const Users = require("../database/Users");
 
 const router = express.Router();
 
@@ -15,9 +16,18 @@ const sessionStrategy = new LocalStrategy({
         return done(null, false);
     }
 
+    const user = await Users.getOneUser(["phone"], [phone_number]);
+
+    let user_id = undefined;
+
+    if (user.length > 0) {
+        user_id = user[0]["user_id"];
+    } 
+
     const permission = 1;
 
     return done(null, {
+        user_id,
         phone_number,
         permission,
     });

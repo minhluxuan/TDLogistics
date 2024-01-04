@@ -10,7 +10,6 @@ const dbOptions = {
 };
 
 const table = "orders";
-const sessionTable = "sessions";
 
 const pool = mysql.createPool(dbOptions).promise();
 
@@ -27,8 +26,14 @@ const getOrder = async (fields, values) => {
     return await utils.find(pool, table, fields, values);
 };
 
+const createNewOrder = async (fields, values) => {
+    console.log(fields);
+    return await utils.insert(pool, table, fields, values);
+}
+
 module.exports = {
     checkExitOrder,
     getAllOrders,
     getOrder,
+    createNewOrder,
 };

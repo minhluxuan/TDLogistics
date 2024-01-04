@@ -12,6 +12,10 @@ const getAllUsers = async () => {
     return await Users.getAllUsers();
 }
 
+const getOneUser = async (fields, values) => {
+    return Users.getOneUser(fields, values);
+}
+
 const getUser = async (fields, values) => {
     return await Users.getUser(fields, values);
 }
@@ -29,6 +33,7 @@ module.exports = {
     checkExistUser,
     createNewUser,
     getAllUsers,
+    getOneUser,
     getUser,
     updateUserInfo,
     checkExistSession,

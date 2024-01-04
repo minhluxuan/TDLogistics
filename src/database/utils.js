@@ -15,7 +15,8 @@ const find = async (pool, table, fields = null, values = null) => {
     let query;
 
     if (fields !== null && values !== null) {
-        query = `SELECT * FROM ${table} WHERE ${fields.map(field => `${field} = ?`)}`;
+        const whereClause =  fields.map(field => `${field} = ? `).join(' AND ');
+        query = `SELECT * FROM ${table} WHERE ${whereClause}`;
     }
     else {
         query = `SELECT * FROM ${table}`;

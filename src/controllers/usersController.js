@@ -53,6 +53,18 @@ const createNewUser = async (req, res) => {
         }
 
         await usersService.createNewUser(newUser);
+
+        const user = await usersService.getOneUser(["phone"], [req.user.phone_number]);
+
+        if (user.length == 0) {
+            return res.status(500).json({
+                error: true,
+                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
+            });
+        }
+
+        req.user.user_id = user[0]["user_id"];
+
         return res.status(200).json({
             error: false,
             message: "Thêm thành công!",
