@@ -68,7 +68,6 @@ class CustomerUserRequestValidation {
     validateUpdatingOrder = () => {
         const schema = Joi.object({
             order_id: Joi.string().alphanum().min(5).max(15).required(),
-            order_time: Joi.date(),
             mass: Joi.number().precision(2).min(0),
             height: Joi.number().precision(2).min(0),
             width: Joi.number().precision(2).min(0),
