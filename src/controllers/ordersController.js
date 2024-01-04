@@ -90,8 +90,9 @@ const createNewOrder = async (req, res) => {
             message: "Bạn không được phép truy cập tài nguyên này.",
         });
     }
+    const userRequestValidation = new utils.UserRequestValidation(req.body);
 
-    const { error } = utils.validateCreatingOrder(req.body);
+    const { error } = userRequestValidation.validateCreatingOrder();
 
     if (error) {
         return res.status(400).json({
