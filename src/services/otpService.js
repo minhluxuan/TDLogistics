@@ -1,7 +1,7 @@
 const OTP = require("../database/OTP");
 
 const createOTP = async (phoneNumber, otp) => {
-    await OTP.createOTP(phoneNumber, email, otp)
+    await OTP.createOTP(phoneNumber, otp)
 }
 
 const verifyOTP = async (phoneNumber, otp) => {
