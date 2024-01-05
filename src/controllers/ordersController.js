@@ -1,24 +1,6 @@
 const { update } = require("../database/utils");
 const ordersService = require("../services/ordersService");
-const dotenv = require("dotenv").config({ path: "../../.env" });
-const Joi = require("joi");
-
-const schema = Joi.object({
-  order_time: Joi.date(),
-  mass: Joi.number(),
-  height: Joi.number(),
-  width: Joi.number(),
-  length: Joi.number(),
-  fee: Joi.number(),
-  source: Joi.string(),
-  destination: Joi.string(),
-  parent: Joi.string(),
-  container: Joi.string(),
-  journey: Joi.string(),
-  COD: Joi.number(),
-  status_success: Joi.number().integer(),
-  miss: Joi.number().integer(),
-}).unknown(false);
+const { CustomerUserRequestValidation } = require("./utils");
 
 const updateUserOrder = async (req, res) => {
   if (!req.isAuthenticated() || req.user.permission < 1) {
@@ -40,7 +22,9 @@ const updateUserOrder = async (req, res) => {
       message: "Số điện thoại không hợp lệ!",
     });
   }
-  const { error, value } = schema.validate(req.body);
+  const { error, value } = new CustomerUserRequestValidation(
+    req.body
+  ).validateUpdatingOrder();
 
   if (error) {
     return res.status(400).json({
