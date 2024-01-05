@@ -34,9 +34,25 @@ const app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
 app.enable('trust proxy');
-app.use(cors());
+
+// Chỉ định danh sách các trang web được phép truy cập
+const allowedOrigins = ['https://customer-merchant-web.vercel.app'];
+
+// Sử dụng cors middleware với tùy chọn chỉ cho phép các trang web trong danh sách
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  // Thêm các tùy chọn khác nếu cần thiết
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
+// app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
