@@ -89,5 +89,5 @@ const cleanUpExpiredSession = new cron.CronJob("0 */12 * * *", async () => {
 });
 
 cleanUpExpiredSession.start();
-
-module.exports = app;
+app.listen(3000, console.log("listening"));
+// module.exports = app;
