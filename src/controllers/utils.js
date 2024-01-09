@@ -8,7 +8,7 @@ const hashPhoneNumber = async (phoneNumber) => {
     return hash.digest("hex");
 }
 
-class CustomerUserRequestValidation {
+class OrderValidation {
     constructor(data) {
         this._data = data;
     }
@@ -37,17 +37,8 @@ class CustomerUserRequestValidation {
     
     validateFindingOrder = () => {
         const schema = Joi.object({
-            order_id: Joi.string().alphanum().min(5).max(15).required(),
             start_order_time: Joi.date(),
             end_order_time: Joi.date(),
-            start_mass: Joi.number().precision(2).min(0),
-            end_mass: Joi.number().precision(2).min(0),
-            start_height: Joi.number().precision(2).min(0),
-            end_height: Joi.number().precision(2).min(0),
-            start_width: Joi.number().precision(2).min(0),
-            end_width: Joi.number().precision(2).min(0),
-            start_length: Joi.number().precision(2).min(0),
-            end_length: Joi.number().precision(2).min(0),
             province_source_code: Joi.number().min(0).max(63),
             province_destination_code: Joi.number().min(0).max(63),
             district_source_code: Joi.number().min(0),
@@ -63,7 +54,6 @@ class CustomerUserRequestValidation {
     
     validateUpdatingOrder = () => {
         const schema = Joi.object({
-            order_id: Joi.string().alphanum().min(5).max(15).required(),
             mass: Joi.number().precision(2).min(0),
             height: Joi.number().precision(2).min(0),
             width: Joi.number().precision(2).min(0),
@@ -77,17 +67,14 @@ class CustomerUserRequestValidation {
     
         return schema.validate(this._data);
     }
-    
-    validateCancelingOrder = () => {
-        const schema = Joi.object({
-            order_id: Joi.string().alphanum().min(5).max(15).required()
-        });
-    
-        return schema.validate(this._data);
-    }
+}
+
+const calculateFee = (distance) => {
+    return distance * 100;
 }
 
 module.exports = {
     hashPhoneNumber,
-    CustomerUserRequestValidation,
+    OrderValidation,
+    calculateFee,
 }
