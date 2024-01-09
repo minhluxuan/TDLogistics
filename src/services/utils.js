@@ -83,6 +83,11 @@ class Map {
     }
 }
 
+const calculateFee = (distance) => {
+    return distance * 100;
+}
+
 module.exports = {
     Map,
+    calculateFee,
 }

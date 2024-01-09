@@ -123,21 +123,4 @@ const cleanUpExpiredSession = new cron.CronJob("0 */12 * * *", async () => {
   
 cleanUpExpiredSession.start();
 
-// const servicesUtils = require("./src/services/utils");
-// const map = new servicesUtils.Map();
-
-// const latlng1 = {
-// 	lat: 10.477041,
-// 	long: 107.271526
-// }
-
-// const latlng2 = {
-// 	lat: 10.525991,
-// 	long: 107.15671211
-// }
-
-// map.convertCoordinateToAddress(latlng1)
-// 	.then(result => console.log(result))
-// 	.catch(error => console.log(error));
-
 module.exports = app;

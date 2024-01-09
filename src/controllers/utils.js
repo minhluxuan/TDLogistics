@@ -15,7 +15,6 @@ class OrderValidation {
 
     validateCreatingOrder = () => {
         const schema = Joi.object({
-            order_id: Joi.string().alphanum().min(5).max(15).required(),
             mass: Joi.number().precision(2).min(0).required(),
             height: Joi.number().precision(2).min(0).required(),
             width: Joi.number().precision(2).min(0).required(),
@@ -28,8 +27,7 @@ class OrderValidation {
             container: Joi.string().alphanum().min(6).max(6),
             journey: Joi.string().alphanum(),
             COD: Joi.number().precision(3).min(0),
-            status_success: Joi.boolean(),
-            miss: Joi.number().min(0).max(3),
+            status_code: Joi.boolean(),
         });
         
         return schema.validate(this._data);
@@ -37,6 +35,7 @@ class OrderValidation {
     
     validateFindingOrder = () => {
         const schema = Joi.object({
+            order_id: Joi.string(),
             start_order_time: Joi.date(),
             end_order_time: Joi.date(),
             province_source_code: Joi.number().min(0).max(63),
@@ -45,8 +44,7 @@ class OrderValidation {
             district_destination_code: Joi.number().min(0),
             town_source_code: Joi.number().min(0),
             town_destination_code: Joi.number().min(0),
-            status_success: Joi.boolean(),
-            miss: Joi.number().min(0).max(3),
+            status_code: Joi.boolean(),
         });
         
         return schema.validate(this._data);
@@ -67,14 +65,17 @@ class OrderValidation {
     
         return schema.validate(this._data);
     }
-}
 
-const calculateFee = (distance) => {
-    return distance * 100;
+    validateCancelingOrder = () => {
+        const schema = Joi.object({
+            order_id: Joi.string().min(16).max(20).required(),
+        });
+
+        return schema.validate(this._data);
+    }
 }
 
 module.exports = {
     hashPhoneNumber,
     OrderValidation,
-    calculateFee,
 }

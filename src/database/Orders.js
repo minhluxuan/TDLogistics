@@ -43,7 +43,7 @@ const getOrder = async (data) => {
     let values = Object.values(data);
     values = [...timeInterval, ...values];
 
-    const query = `SELECT order_id, user_id, order_time, mass, height, width, length, long_source, lat_source, long_destination, lat_destination, address_source, address_destination, fee, COD, status_success FROM ${table} WHERE ${whereClause}`;
+    const query = `SELECT order_id, user_id, order_time, mass, height, width, length, long_source, lat_source, long_destination, lat_destination, address_source, address_destination, fee, COD, status_code FROM ${table} WHERE ${whereClause}`;
 
     const result = await pool.query(query, values);
 
