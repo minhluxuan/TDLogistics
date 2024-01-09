@@ -5,6 +5,7 @@ class Map {
                 key: process.env.GOOGLE_API_KEY,
             });
         } catch (error) {
+            console.log(error);
             throw new Error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
         }
     }
