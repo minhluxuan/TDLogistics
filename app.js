@@ -37,7 +37,7 @@ app.set('view engine', 'jade');
 app.enable('trust proxy');
 
 // Chỉ định danh sách các trang web được phép truy cập
-const allowedOrigins = ['https://customer-merchant-web.vercel.app', 'testwebmerchant.vercel.app'];
+const allowedOrigins = ['https://customer-merchant-web.vercel.app', 'https://testwebmerchant.vercel.app'];
 
 // Sử dụng cors middleware với tùy chọn chỉ cho phép các trang web trong danh sách
 app.use(cors({
