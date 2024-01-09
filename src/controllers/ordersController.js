@@ -95,8 +95,18 @@ const createNewOrder = async (req, res) => {
 
     const fee = utils.calculateFee(distance);
 
-    const addressSource = await map.convertCoordinateToAddress(req.body.source);
-    const addressDestination = await map.convertCoordinateToAddress(req.body.destination);
+    const source = {
+        lat: req.body.lat_source,
+        long: req.body.long_source,
+    };
+
+    const destination = {
+        lat: req.body.lat_destination,
+        long: req.body.long_destination,
+    };
+
+    const addressSource = await map.convertCoordinateToAddress(source);
+    const addressDestination = await map.convertCoordinateToAddress(destination);
 
     keys.push("order_time");
     values.push(formattedOrderTime);
