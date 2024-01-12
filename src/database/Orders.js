@@ -38,6 +38,6 @@ const updateOrderJourney = async (newJourneyValue, conditionFields, conditionVal
     console.log(err);
   }
 };
-// const newJourney = { time: "2023-01-02T00:00:00Z", location: "location4" };
-// updatedOrderJourney(newJourney, "id", 3);
-module.exports = { updateOrder, updateOrderJourney };
+const newJourney = { time: "2023-01-02T00:00:00Z", location: "location4" };
+updateOrderJourney(newJourney, "id", 3);
+// module.exports = { updateOrder, updateOrderJourney };
