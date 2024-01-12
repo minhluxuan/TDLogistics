@@ -1,6 +1,6 @@
 const mysql = require("mysql2");
 const utils = require("./utils");
-//const { PoolCluster } = require("mysql2/typings/mysql/lib/PoolCluster");
+const REGEX_PHONE_NUMBER = new RegExp(process.env.REGEX_PHONE_NUMBER);
 const dbOptions = {
   host: "db4free.net",
   user: "demotdlogistic1",
@@ -15,10 +15,22 @@ const pool = mysql.createPool(dbOptions).promise();
 
 const createComplaint = async (fields, values) => {
   const requiredFields = ["phone_number", "complaint_type", "datetime", "status"];
+  const typeValues = ["Delivery", "Application"];
+  const statusValues = ["Ok", "On hold"];
+
   for (let i = 0; i < requiredFields.length; i++) {
     if (fields.indexOf(requiredFields[i]) === -1 || values[fields.indexOf(requiredFields[i])] === null) {
       throw new Error(`Missing field ${requiredFields[i]}`);
     }
+  }
+  if (!REGEX_PHONE_NUMBER.test(values[fields.indexOf("phone_number")])) {
+    throw new Error(`Invalid phone number: ${values[fields.indexOf("phone_number")]}`);
+  }
+  if (!typeValues.includes(values[fieldIndex])) {
+    throw new Error(`Invalid complaint type: ${values[fieldIndex]}`);
+  }
+  if (!statusValues.includes(values[fieldIndex])) {
+    throw new Error(`Invalid status: ${values[fieldIndex]}`);
   }
   //check for datetime will be made in router/service
   return await utils.insert(pool, table, fields, values);
