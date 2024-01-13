@@ -1,6 +1,7 @@
 const mysql = require("mysql2");
 const utils = require("./utils");
 const REGEX_PHONE_NUMBER = new RegExp(process.env.REGEX_PHONE_NUMBER);
+const REGEX_DATETIME = new RegExp(process.env.REGEX_DATETIME);
 const dbOptions = {
   host: "db4free.net",
   user: "demotdlogistic1",
@@ -26,13 +27,15 @@ const createComplaint = async (fields, values) => {
   if (!REGEX_PHONE_NUMBER.test(values[fields.indexOf("phone_number")])) {
     throw new Error(`Invalid phone number: ${values[fields.indexOf("phone_number")]}`);
   }
+  if (!REGEX_DATETIME.test(values[fields.indexOf("datetime")])) {
+    throw new Error(`Invalid Datetime ${values[fields.indexOf("datetime")]}`);
+  }
   if (!typeValues.includes(values[fieldIndex])) {
     throw new Error(`Invalid complaint type: ${values[fieldIndex]}`);
   }
   if (!statusValues.includes(values[fieldIndex])) {
     throw new Error(`Invalid status: ${values[fieldIndex]}`);
   }
-  //check for datetime will be made in router/service
   return await utils.insert(pool, table, fields, values);
 };
 
@@ -59,7 +62,7 @@ const getComplaint = async (fields, values) => {
   return await utils.findWithFilters(pool, table, fields, values);
 };
 
-const updateComplaint = async (values, conditionFields, conditionValues) => {
+const updateComplaint = async (values, idValues) => {
   const valueFields = ["Open", "Closed"];
   for (let i = 0; i < values.length; i++) {
     if (!valueFields.includes(values[i])) {
@@ -67,7 +70,7 @@ const updateComplaint = async (values, conditionFields, conditionValues) => {
     }
   }
   try {
-    await utils.update(pool, table, ["status"], values, conditionFields, conditionValues);
+    await utils.update(pool, table, ["status"], values, ["id"], idValues);
     console.log("update success");
   } catch (err) {
     console.log(err);

@@ -87,7 +87,35 @@ class CustomerUserRequestValidation {
   };
 }
 
+// TODO: Extract only field in requiredFields, can be use for both req.body and req.query
+const extractRequiredFields = (body, requiredFields) => {
+  const fields = [];
+  const values = [];
+  requiredFields.forEach((element) => {
+    if (!element in body) {
+      throw new Error(`Missing field ${element}`);
+    }
+    fields.push(element);
+    values.push(body[element]);
+  });
+  return [fields, values];
+};
+// TODO: Extract fields in extractFields, can be use for both req.body and req.query
+const extractFields = (body, extractFields) => {
+  const fields = [];
+  const values = [];
+  extractFields.forEach((field) => {
+    if (field in body) {
+      fields.push(field);
+      values.push(body[field]);
+    }
+  });
+  return [fields, values];
+};
+
 module.exports = {
   hashPhoneNumber,
   CustomerUserRequestValidation,
+  extractRequiredFields,
+  extractFields,
 };

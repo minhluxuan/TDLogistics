@@ -12,8 +12,8 @@ const getComplaint = async (fields, values) => {
   return await database.getComplaint(fields, values);
 };
 
-const updateComplaint = async (statusValue, conditionFields, conditionValues) => {
-  return await database.updateComplaint(statusValue, conditionFields, conditionValues);
+const updateComplaint = async (statusValue, id) => {
+  return await database.updateComplaint(statusValue, id);
 };
 
 const deleteComplaint = async (id) => {
