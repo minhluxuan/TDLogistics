@@ -15,27 +15,27 @@ const table = "complaints";
 const pool = mysql.createPool(dbOptions).promise();
 
 const createComplaint = async (fields, values) => {
-  const requiredFields = ["phone_number", "complaint_type", "datetime", "status"];
-  const typeValues = ["Delivery", "Application"];
-  const statusValues = ["Ok", "On hold"];
+  // const requiredFields = ["phone_number", "complaint_type", "datetime", "status"];
+  // const typeValues = ["Delivery", "Application"];
+  // const statusValues = ["Ok", "On hold"];
 
-  for (let i = 0; i < requiredFields.length; i++) {
-    if (fields.indexOf(requiredFields[i]) === -1 || values[fields.indexOf(requiredFields[i])] === null) {
-      throw new Error(`Missing field ${requiredFields[i]}`);
-    }
-  }
-  if (!REGEX_PHONE_NUMBER.test(values[fields.indexOf("phone_number")])) {
-    throw new Error(`Invalid phone number: ${values[fields.indexOf("phone_number")]}`);
-  }
-  if (!REGEX_DATETIME.test(values[fields.indexOf("datetime")])) {
-    throw new Error(`Invalid Datetime ${values[fields.indexOf("datetime")]}`);
-  }
-  if (!typeValues.includes(values[fieldIndex])) {
-    throw new Error(`Invalid complaint type: ${values[fieldIndex]}`);
-  }
-  if (!statusValues.includes(values[fieldIndex])) {
-    throw new Error(`Invalid status: ${values[fieldIndex]}`);
-  }
+  // for (let i = 0; i < requiredFields.length; i++) {
+  //   if (fields.indexOf(requiredFields[i]) === -1 || values[fields.indexOf(requiredFields[i])] === null) {
+  //     throw new Error(`Missing field ${requiredFields[i]}`);
+  //   }
+  // }
+  // if (!REGEX_PHONE_NUMBER.test(values[fields.indexOf("phone_number")])) {
+  //   throw new Error(`Invalid phone number: ${values[fields.indexOf("phone_number")]}`);
+  // }
+  // if (!REGEX_DATETIME.test(values[fields.indexOf("datetime")])) {
+  //   throw new Error(`Invalid Datetime ${values[fields.indexOf("datetime")]}`);
+  // }
+  // if (!typeValues.includes(values[fieldIndex])) {
+  //   throw new Error(`Invalid complaint type: ${values[fieldIndex]}`);
+  // }
+  // if (!statusValues.includes(values[fieldIndex])) {
+  //   throw new Error(`Invalid status: ${values[fieldIndex]}`);
+  // }
   return await utils.insert(pool, table, fields, values);
 };
 
@@ -63,12 +63,12 @@ const getComplaint = async (fields, values) => {
 };
 
 const updateComplaint = async (values, idValues) => {
-  const valueFields = ["Open", "Closed"];
-  for (let i = 0; i < values.length; i++) {
-    if (!valueFields.includes(values[i])) {
-      throw new Error(`Invalid value for status: ${values[i]}`);
-    }
-  }
+  // const valueFields = ["Open", "Closed"];
+  // for (let i = 0; i < values.length; i++) {
+  //   if (!valueFields.includes(values[i])) {
+  //     throw new Error(`Invalid value for status: ${values[i]}`);
+  //   }
+  // }
   try {
     await utils.update(pool, table, ["status"], values, ["id"], idValues);
     console.log("update success");
