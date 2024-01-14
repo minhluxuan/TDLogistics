@@ -77,7 +77,7 @@ const cancelOrder = async (fields, values) => {
     const query = `DELETE FROM ${table} WHERE ${whereClause}`;
     
     const result = await pool.query(query, [...values, formattedTime]);
-    return result;
+    return result[0];
 };
 
 module.exports = {

@@ -1,0 +1,28 @@
+{
+    "CPN": {
+        "inner_province": {
+            "detail": [
+                {
+                    "from_mass": 0,
+                    "to_mass": 50,
+                    "fee": 8000
+                }
+            ]
+        },
+        "outer_province": {
+            "from_province": "SG",
+            "to_province": "ĐNa",
+            "detail": [
+                {
+                    "from_mass": 0,
+                    "to_mass": 50,
+                    "detail": [
+                        {
+
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

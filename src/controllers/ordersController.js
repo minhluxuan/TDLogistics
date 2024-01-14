@@ -177,7 +177,7 @@ const updateOrder = async (req, res) => {
 
     try {
         const result = await ordersService.updateOrder(fields, values, conditionFields, conditionValues);
-        console.log(result);
+
         if (result.affectedRows <= 0) {
             return res.status(404).json({
                 error: true,

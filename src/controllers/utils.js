@@ -75,7 +75,30 @@ class OrderValidation {
     }
 }
 
+class ComplaintValidation {
+    validateCreatingComplaint = (data) => {
+        const schema = Joi.object({
+            type: Joi.string().required(),
+            description: Joi.string().required(),
+        });
+
+        return schema.validate(data);
+    }
+
+    validateFindingComplaint = (data) => {
+        const schema = Joi.object({
+            type: Joi.string(),
+            status: Joi.string(),
+            start_time: Joi.date(),
+            end_time: Joi.date(),
+        });
+
+        return schema.validate(data);
+    }
+}
+
 module.exports = {
     hashPhoneNumber,
     OrderValidation,
+    ComplaintValidation,
 }

@@ -118,3 +118,29 @@ DELETE http://localhost:5000/api/v1/orders/cancel?order_id=TD20240217499622
 ###
 
 GET http://localhost:5000/api/v1/orders/check?order_id=TD20240217499622
+
+###
+
+POST http://localhost:5000/api/v1/complaints/create
+content-type: application/json
+
+{
+    "type": "application",
+    "description": "App bị lag"
+}
+
+###
+
+POST http://localhost:5000/api/v1/complaints/search
+content-type: application/json
+
+{
+    "start_time": "2024-01-13 00:00:00",
+    "end_time": "2024-01-15 00:00:00",
+    "type": "application",
+    "status": "open"
+}
+
+###
+
+DELETE http://localhost:5000/api/v1/complaints/delete?id=3

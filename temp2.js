@@ -1,7 +1,5 @@
-const foo2 = require("./temp2");
-
 const foo = () => {
-  foo2();
+    throw new Error("error");
 }
 
 module.exports = foo;
