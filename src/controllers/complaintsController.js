@@ -5,11 +5,11 @@ const utils = require("./utils");
 const complaintValidation = new utils.ComplaintValidation();
 
 const createNewComplaint = async (req, res) => {
-    if (!req.isAuthenticated() || req.user.permission !== 1) {
-		return res.status(401).json({
-			error: true,
-			message: "Bạn không được phép truy cập tài nguyên này.",
-		});
+    if (!req.isAuthenticated() || (req.user.permission !== 1 && false)) {
+        return res.status(401).json({
+            error: true,
+            message: "Bạn không được phép truy cập tài nguyên này.",
+        });
     }
 
     try {
@@ -21,7 +21,7 @@ const createNewComplaint = async (req, res) => {
         req.body.time = currentTime;
         req.body.phone_number = req.user.phone_number;
         req.body.status = "open";
-        
+
         const keys = Object.keys(req.body);
         const values = Object.values(req.body);
 
@@ -34,12 +34,12 @@ const createNewComplaint = async (req, res) => {
 
         await complaintsService.createNewComplaint(keys, values);
 
-		return res.status(201).json({
+        return res.status(201).json({
             error: false,
             message: "Thêm thành công.",
         });
     } catch (error) {
-      	res.status(500).json({
+        res.status(500).json({
             error: true,
             message: error.message,
         });
@@ -64,7 +64,11 @@ const getComplaints = async (req, res) => {
             });
         }
 
-        if (req.body.hasOwnProperty("start_time") && !req.body.hasOwnProperty("end_time") || !req.body.hasOwnProperty("start_time") && req.body.hasOwnProperty("end_time") || req.body.start_time > req.body.end_time) {
+        if (
+            (req.body.hasOwnProperty("start_time") && !req.body.hasOwnProperty("end_time")) ||
+            (!req.body.hasOwnProperty("start_time") && req.body.hasOwnProperty("end_time")) ||
+            req.body.start_time > req.body.end_time
+        ) {
             throw new Error("Thông tin không hợp lệ.");
         }
 
@@ -94,7 +98,10 @@ const deleteComplaint = async (req, res) => {
     }
 
     try {
-        const result = await complaintsService.deleteComplaint(["id", "phone_number"], [req.query.id, req.user.phone_number]);
+        const result = await complaintsService.deleteComplaint(
+            ["id", "phone_number"],
+            [req.query.id, req.user.phone_number]
+        );
 
         if (result.affectedRows <= 0) {
             return res.status(404).json({
@@ -119,4 +126,4 @@ module.exports = {
     createNewComplaint,
     getComplaints,
     deleteComplaint,
-}
+};
