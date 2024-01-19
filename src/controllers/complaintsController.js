@@ -23,7 +23,6 @@ const createNewComplaint = async (req, res) => {
         const files = req.files;
         const img = new Array();
 
-
         req.body.time = currentTime;
         req.body.phone_number = req.user.phone_number;
         req.body.status = "open";
