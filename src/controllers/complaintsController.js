@@ -1,4 +1,6 @@
 const moment = require("moment");
+const fs = require("fs");
+const path = require("path");
 const complaintsService = require("../services/complaintsService");
 const utils = require("./utils");
 
@@ -13,15 +15,29 @@ const createNewComplaint = async (req, res) => {
     }
 
     try {
-        const { error } = complaintValidation.validateCreatingComplaint(req.body);
-
         let currentTime = new Date();
         currentTime = moment(currentTime).format("YYYY-MM-DD HH:mm:ss");
+
+        const { error } = complaintValidation.validateCreatingComplaint(req.body);
+
+        const files = req.files;
+        const img = new Array();
+
 
         req.body.time = currentTime;
         req.body.phone_number = req.user.phone_number;
         req.body.status = "open";
-        
+
+        if (files && files.length > 0) {
+            files.forEach(file => {
+                img.push(file.filename);
+            });
+            req.body.img = JSON.stringify(img);
+        }
+        else {
+            req.body.img = JSON.stringify(new Array());
+        }
+
         const keys = Object.keys(req.body);
         const values = Object.values(req.body);
 
@@ -33,6 +49,25 @@ const createNewComplaint = async (req, res) => {
         }
 
         await complaintsService.createNewComplaint(keys, values);
+
+        if (files && files.length > 0) {
+            await Promise.all(files.map(async (file) => {
+                const tempFolderPath = path.join("img", "complaints_temp");
+                if (!fs.existsSync(tempFolderPath)) {
+                    await fs.promises.mkdir(tempFolderPath, {recursive: true});
+                }
+
+                const officialFolderPath = path.join("img", "complaints");
+                if (!fs.existsSync(officialFolderPath)) {
+                    await fs.promises.mkdir(officialFolderPath, {recursive: true});
+                }
+
+                const tempFilePath = path.join(tempFolderPath, file.filename);
+                const officialFilePath = path.join(officialFolderPath, file.filename);
+                
+                await fs.promises.rename(tempFilePath, officialFilePath);
+            }));
+        }
 
 		return res.status(201).json({
             error: false,
