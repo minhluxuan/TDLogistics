@@ -73,6 +73,7 @@ const verifyOTPSuccess = (req, res) => {
     });
 }
 
+
 module.exports = {
     createOTP,
     verifyOTPMiddleware,

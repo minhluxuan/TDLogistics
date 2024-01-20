@@ -97,8 +97,37 @@ class ComplaintValidation {
     }
 }
 
+class BusinessValidation {
+    validateFindingBusinessByBusiness = (data) => {
+        const schema = Joi.object({
+            business_id: Joi.string().pattern(new RegExp("^[0-9]+$")).required(),
+        }).strict();
+
+        return schema.validate(data);
+    }
+
+    validateUpdatePassword = (data) => {
+        const schema = Joi.object({
+            new_password: joiPassword
+            .string()
+            .min(8)
+            .minOfSpecialCharacters(1)
+            .minOfLowercase(1)
+            .minOfUppercase(1)
+            .minOfNumeric(0)
+            .noWhiteSpaces()
+            .required(),
+            confirm_password: Joi.string().valid(Joi.ref('new_password')).required()
+        }).strict();
+        return schema.validate(data);
+    }
+}
+
+
+
 module.exports = {
     hashPhoneNumber,
     OrderValidation,
     ComplaintValidation,
+    BusinessValidation,
 }

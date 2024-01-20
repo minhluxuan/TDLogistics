@@ -33,10 +33,10 @@ const sessionStrategy = new LocalStrategy({
     });
 });
 
-passport.use(sessionStrategy);
+passport.use("otpLogin",sessionStrategy);
 
 router.post("/send_otp", otpController.createOTP);
-router.post("/verify_otp", passport.authenticate("local", {
+router.post("/verify_otp", passport.authenticate("otpLogin", {
     failureRedirect: "/api/v1/otp/otp_fail",
     successRedirect: "/api/v1/otp/otp_success",
     failureFlash: true,
