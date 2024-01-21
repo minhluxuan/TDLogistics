@@ -11,6 +11,7 @@ const cors = require("cors");
 const flash = require("express-flash");
 const passport = require("passport");
 const dotenv = require("dotenv");
+const utils=require("./utils");
 dotenv.config();
 
 const indexRouter = require('./routes/index');
@@ -18,6 +19,7 @@ const usersRouter = require("./src/routes/usersRoute");
 const otpRouter = require("./src/routes/otpRoute");
 const ordersRouter = require("./src/routes/ordersRoute");
 const complaintsRouter = require("./src/routes/complaintsRoute");
+const businessRouter = require("./src/routes/businessRoute");
 
 const dbOptions = {
 	host: process.env.HOST,
@@ -76,9 +78,13 @@ app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/business", businessRouter);
+
 app.use("/api/v1/otp", otpRouter);
 app.use("/api/v1/orders", ordersRouter);
 app.use("/api/v1/complaints", complaintsRouter);
+
+
 app.use("/get_session", (req, res) => {
 	console.log(req.user);
 	return res.status(200).json({
@@ -86,6 +92,8 @@ app.use("/get_session", (req, res) => {
 		message: "Lấy phiên hoạt động thành công.",
 	});
 });
+
+
 app.get("/destroy_session", (req, res) => {
 	req.logout(() => {
 		req.session.destroy();
@@ -94,6 +102,11 @@ app.get("/destroy_session", (req, res) => {
 		error: false,
 		message: "Hủy phiên hoạt động thành công.",
 	});
+});
+
+passport.serializeUser(utils.setSession);
+passport.deserializeUser((user, done) => {
+    utils.verifyPermission(user, done);
 });
 
 // catch 404 and forward to error handler

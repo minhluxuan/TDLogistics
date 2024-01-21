@@ -38,8 +38,8 @@ passport.use("businessLogin", sessionStrategy);
 
 
 router.post("/login", passport.authenticate("businessLogin", {
-    successRedirect: "api/v1/business_user/login_success",
-    failureRedirect: "/api/v1/business_user/login_fail",
+    successRedirect: "/api/v1/business/login_success",
+    failureRedirect: "/api/v1/business/login_fail",
     failureFlash: true,
 }), businessController.verifyBusinesUserSuccess);
 router.post("/login_success", businessController.verifyBusinesUserSuccess);
@@ -47,13 +47,5 @@ router.post("/login_fail", businessController.verifyBusinesUserFail);
 router.patch("/update_password", businessController.updatePassword);
 router.get("/logout", businessController.logout);
 
-passport.serializeUser(utils.setBusinessUserSession);
-passport.deserializeUser((user, done) => {
-    utils.verifyPermissionBusinessUser(user, done);
-});
-// passport.serializeUser(utils.setSession);
-// passport.deserializeUser((user, done) => {
-//     utils.verifyPermission(user, done);
-// });
 
 module.exports = router;

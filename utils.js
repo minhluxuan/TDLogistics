@@ -1,15 +1,14 @@
+const { object } = require("joi");
+
 const setSession = (user, done) => {
-    done(null, { user_id: user.user_id, phone_number: user.phone_number, permission: user.permission });
+  
+    done(null, user);
 }
 
 const verifyPermission = (user, done) => {
     if (user.permission > 0) {
-        return done(null, {
-            user_id: user.user_id,
-            phone_number: user.phone_number,
-            permission: user.permission,
-            active: true,
-        });
+        user.active=true;
+        return done(null, user);
     }
     done(null, false);
 }
@@ -27,26 +26,8 @@ const isAuthenticated = (permission) => {
     }
 }
 
-const setBusinessUserSession = (user, done) => {
-    done(null, { business_id: user.business_id, permission: user.permission });
-}
-
-const verifyBusinessPermission = (user, done) => {
-    if (user.permission > 0) {
-        return done(null, {
-            business_id: user.business_id,
-            permission: user.permission,
-            active: true,
-        });
-    }
-    done(null, false);
-}
-
 module.exports = {
     setSession,
     verifyPermission,
     isAuthenticated,
-    setBusinessUserSession,
-    verifyBusinessPermission
-
 }

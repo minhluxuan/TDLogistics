@@ -51,9 +51,5 @@ router.post("/verify_otp_update", passport.authenticate("otpUpdate", {
 router.get("/otp_fail", otpController.verifyOTPFail);
 router.get("/otp_success", otpController.verifyOTPSuccess);
 
-passport.serializeUser(utils.setBusinessUserSession);
-passport.deserializeUser((businessUser, done) => {
-    utils.verifyBusinessPermission(businessUser, done);
-});
 
 module.exports = router;
