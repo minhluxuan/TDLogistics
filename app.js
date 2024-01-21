@@ -10,6 +10,7 @@ const cron = require("cron");
 const cors = require("cors");
 const flash = require("express-flash");
 const passport = require("passport");
+const utils = require("./utils");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -18,6 +19,7 @@ const usersRouter = require("./src/routes/usersRoute");
 const otpRouter = require("./src/routes/otpRoute");
 const ordersRouter = require("./src/routes/ordersRoute");
 const complaintsRouter = require("./src/routes/complaintsRoute");
+const businessRouter = require("./src/routes/businessRoute");
 
 const dbOptions = {
 	host: process.env.HOST,
@@ -79,6 +81,7 @@ app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/otp", otpRouter);
 app.use("/api/v1/orders", ordersRouter);
 app.use("/api/v1/complaints", complaintsRouter);
+app.use("/api/v1/business", businessRouter);
 app.use("/get_session", (req, res) => {
 	console.log(req.user);
 	return res.status(200).json({
@@ -96,9 +99,14 @@ app.get("/destroy_session", (req, res) => {
 	});
 });
 
+passport.serializeUser(utils.setSession);
+passport.deserializeUser((user, done) => {
+    utils.verifyPermission(user, done);
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+	next(createError(404));
 });
 
 // error handler

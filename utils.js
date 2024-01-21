@@ -1,17 +1,17 @@
+const bcrypt = require("bcrypt");
+
+const hash = (password) => {
+    const salt = bcrypt.genSaltSync(parseInt(process.env.SALTROUNDS));
+    const hashPassword = bcrypt.hashSync(password, salt);
+    return hashPassword;
+}
+
 const setSession = (user, done) => {
-    done(null, { user_id: user.user_id, phone_number: user.phone_number, permission: user.permission });
+    done(null, user);
 }
 
 const verifyPermission = (user, done) => {
-    if (user.permission > 0) {
-        return done(null, {
-            user_id: user.user_id,
-            phone_number: user.phone_number,
-            permission: user.permission,
-            active: true,
-        });
-    }
-    done(null, false);
+    return done(null, user);
 }
 
 const isAuthenticated = (permission) => {
@@ -28,6 +28,7 @@ const isAuthenticated = (permission) => {
 }
 
 module.exports = {
+    hash,
     setSession,
     verifyPermission,
     isAuthenticated,

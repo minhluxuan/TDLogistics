@@ -43,10 +43,5 @@ router.post("/verify_otp", passport.authenticate("local", {
 }), otpController.verifyOTPSuccess);
 router.get("/otp_fail", otpController.verifyOTPFail);
 router.get("/otp_success", otpController.verifyOTPSuccess);
-            
-passport.serializeUser(utils.setSession);
-passport.deserializeUser((user, done) => {
-    utils.verifyPermission(user, done);
-});
 
 module.exports = router;
