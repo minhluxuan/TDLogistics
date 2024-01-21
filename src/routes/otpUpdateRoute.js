@@ -3,7 +3,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const otpController = require("../controllers/otpController");
 const Business = require("../database/Business");
-const utils = require("../utils");
+const utils = require("../../utils");
 
 const router = express.Router();
 
@@ -51,9 +51,9 @@ router.post("/verify_otp_update", passport.authenticate("otpUpdate", {
 router.get("/otp_fail", otpController.verifyOTPFail);
 router.get("/otp_success", otpController.verifyOTPSuccess);
 
-passport.serializeUser(utils.setStaffSession);
-passport.deserializeUser((staff, done) => {
-    utils.verifyStaffPermission(staff, done);
+passport.serializeUser(utils.setBusinessUserSession);
+passport.deserializeUser((businessUser, done) => {
+    utils.verifyBusinessPermission(businessUser, done);
 });
 
 module.exports = router;
