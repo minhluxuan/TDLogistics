@@ -27,8 +27,26 @@ const isAuthenticated = (permission) => {
     }
 }
 
+const setBusinessUserSession = (user, done) => {
+    done(null, { business_id: user.business_id, permission: user.permission });
+}
+
+const verifyBusinessPermission = (user, done) => {
+    if (user.permission > 0) {
+        return done(null, {
+            business_id: user.business_id,
+            permission: user.permission,
+            active: true,
+        });
+    }
+    done(null, false);
+}
+
 module.exports = {
     setSession,
     verifyPermission,
     isAuthenticated,
+    setBusinessUserSession,
+    verifyBusinessPermission
+
 }
