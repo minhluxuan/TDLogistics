@@ -37,7 +37,6 @@ const sessionStrategy = new LocalStrategy({
 passport.use("businessLogin", sessionStrategy);
 
 
-router.get("/search", staffsController.getStaffs);
 router.post("/login", passport.authenticate("businessLogin", {
     successRedirect: "api/v1/business_user/login_success",
     failureRedirect: "/api/v1/business_user/login_fail",
@@ -52,5 +51,9 @@ passport.serializeUser(utils.setBusinessUserSession);
 passport.deserializeUser((user, done) => {
     utils.verifyPermissionBusinessUser(user, done);
 });
+// passport.serializeUser(utils.setSession);
+// passport.deserializeUser((user, done) => {
+//     utils.verifyPermission(user, done);
+// });
 
 module.exports = router;
