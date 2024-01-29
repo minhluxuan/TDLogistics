@@ -5,7 +5,7 @@ const sizeOf = require("image-size");
 // const imageType = require("image-type");
 
 const complaintsController = require("../controllers/complaintsController");
-const utils = require("../utils");
+const Auth = require("../lib/Auth");
 
 const storage = multer.diskStorage({
     destination: function (req, file, done) {
@@ -39,7 +39,7 @@ const upload = multer({
     fileFilter: fileFilter,
 });
 
-router.post("/create", utils.isAuthenticated(1), upload.array("images", 5), complaintsController.createNewComplaint);
+router.post("/create", Auth.isAuthenticated(1), upload.array("images", 5), complaintsController.createNewComplaint);
 router.post("/search", complaintsController.getComplaints);
 router.delete("/delete", complaintsController.deleteComplaint);
 
