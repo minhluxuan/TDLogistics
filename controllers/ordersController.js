@@ -1,7 +1,8 @@
 const moment = require("moment");
 const ordersService = require("../services/ordersService");
-const utils = require("./utils");
-const servicesUtils = require("../services/utils");
+const Validation = require("../lib/Validation");
+const libMap = require("../lib/Map");
+
 
 const checkExistOrder = async (req, res) => {
     try {
@@ -28,7 +29,7 @@ const getOrder = async (req, res) => {
         });
     }
 
-    const ordersValidation = new utils.OrderValidation(req.body);
+    const ordersValidation = new Validation.OrderValidation(req.body);
     const { error } = ordersValidation.validateFindingOrder();
 
     if (error) {
@@ -68,7 +69,7 @@ const createNewOrder = async (req, res) => {
     }
 
     try {
-        const userRequestValidation = new utils.OrderValidation(req.body);
+        const userRequestValidation = new Validation.OrderValidation(req.body);
 
         const { error } = userRequestValidation.validateCreatingOrder();
 
@@ -79,7 +80,7 @@ const createNewOrder = async (req, res) => {
             });
         }
 
-        const map = new servicesUtils.Map();
+        const map = new libMap.Map();
 
         const source = {
             lat: req.body.lat_source,
@@ -93,7 +94,7 @@ const createNewOrder = async (req, res) => {
 
         const distance = (await map.calculateDistance(source, destination)).distance;
 
-        const fee = servicesUtils.calculateFee(distance);
+        const fee = libMap.calculateFee(distance);
 
         const addressSource = await map.convertCoordinateToAddress(source);
         const addressDestination = await map.convertCoordinateToAddress(destination);
@@ -160,7 +161,7 @@ const updateOrder = async (req, res) => {
         });
     }
 
-    const { error } = new utils.OrderValidation(req.body).validateUpdatingOrder();
+    const { error } = new Validation.OrderValidation(req.body).validateUpdatingOrder();
     
     if (error) {
         return res.status(400).json({
@@ -197,11 +198,11 @@ const updateOrder = async (req, res) => {
             long: updatedRow["long_destination"]
         };
 
-        const map = new servicesUtils.Map();
+        const map = new libMap.Map();
 
         const distance = (await map.calculateDistance(source, destination)).distance;
 
-        const updatingFee = servicesUtils.calculateFee(distance);
+        const updatingFee = Map.calculateFee(distance);
 
         const updatingAddressSource = await map.convertCoordinateToAddress(source);
         const updatingAddressDestination = await map.convertCoordinateToAddress(destination);
@@ -230,7 +231,7 @@ const cancelOrder = async (req, res) => {
 
     const orderId = req.query.order_id;
 
-    const { error } = (new utils.OrderValidation({ order_id: orderId })).validateCancelingOrder();
+    const { error } = (new Validation.OrderValidation({ order_id: orderId })).validateCancelingOrder();
 
     if (error) {
         return res.status(401).json({

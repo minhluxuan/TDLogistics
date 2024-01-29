@@ -1,5 +1,5 @@
 const mysql = require("mysql2");
-const utils = require("./utils");
+const SQLutils = require("../lib/SQLutils");
 
 const dbOptions = {
     host: process.env.HOST,
@@ -15,7 +15,7 @@ const sessionTable="sessions";
 const pool = mysql.createPool(dbOptions).promise();
 
 const checkExistUser = async (phoneNumber) => {
-    const result = await utils.findOne(pool, table, ["phone"], [phoneNumber]);
+    const result = await SQLutils.findOne(pool, table, ["phone"], [phoneNumber]);
     return result.length > 0;
 };
 
@@ -29,27 +29,27 @@ const createNewUser = async (newUser) => {
     }
 
     const { fullname, email, phoneNumber } = newUser;
-    await utils.insert(pool, table, ["user_id", "fullname", "email", "phone"], [userId, fullname, email, phoneNumber]);
+    await SQLutils.insert(pool, table, ["user_id", "fullname", "email", "phone"], [userId, fullname, email, phoneNumber]);
 }
 
 const getAllUsers = async () => {
-    return await utils.find(pool, table);
+    return await SQLutils.find(pool, table);
 }
 
 const getOneUser = async (fields, values) => {
-    return await utils.findOne(pool, table, fields, values);
+    return await SQLutils.findOne(pool, table, fields, values);
 }
 
 const getUser = async (fields, values) => {
-    return await utils.find(pool, table, fields, values);
+    return await SQLutils.find(pool, table, fields, values);
 }
 
 const updateUserInfo = async (fields, values, conditionFields, conditionValues) => {
-    await utils.update(pool, table, fields, values, conditionFields, conditionValues);
+    await SQLutils.update(pool, table, fields, values, conditionFields, conditionValues);
 }
 
 const checkExistSession = async (sessionId) => {
-  const result = await utils.findOne(pool, sessionTable, ["session_id"], [sessionId]);
+  const result = await SQLutils.findOne(pool, sessionTable, ["session_id"], [sessionId]);
   return result.length > 0;
 };
 

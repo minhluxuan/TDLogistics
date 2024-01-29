@@ -1,5 +1,5 @@
 const mysql = require("mysql2");
-const utils = require("./utils");
+const SQLutils = require("../lib/SQLutils");
 
 const dbOptions = {
     host: process.env.HOST,
@@ -14,7 +14,7 @@ const table = "complaint";
 const pool = mysql.createPool(dbOptions).promise();
 
 const createNewComplaint = async (fields, values) => {
-    return await utils.insert(pool, table, fields, values);
+    return await SQLutils.insert(pool, table, fields, values);
 };
 
 const getComplaints = async (data) => {
@@ -46,7 +46,7 @@ const getComplaints = async (data) => {
 };
 
 const deleteComplaint = async (fields, values) => {
-    const result = await utils.deleteOne(pool, table, fields, values);
+    const result = await SQLutils.deleteOne(pool, table, fields, values);
     return result[0];
 };
 

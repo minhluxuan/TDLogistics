@@ -1,8 +1,8 @@
-const controllerUtils = require("./utils")
 const businessService = require ("../services/businessService");
-const utils = require("../../utils");
+const Validation = require("../lib/Validation");
+const Hash = require("../lib/Hash");
 
-const businessValidation = new controllerUtils.BusinessValidation();
+const businessValidation = new Validation.BusinessValidation();
 
 const verifyBusinessUserSuccess = (req, res) => {
 	return res.status(200).json({
@@ -82,7 +82,7 @@ const updatePassword = async (req, res) => {
 		});
 	}
 	
-	const hashedNewPassword = utils.hash(req.body.new_password);
+	const hashedNewPassword = Hash.hashPassword(req.body.new_password);
 
 	try {
 		const result = await businessService.updatePassword(["password", "active"], [hashedNewPassword, 1], ["business_id"], [req.user.business_id]) ;

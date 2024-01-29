@@ -1,4 +1,4 @@
-const Users = require("../database/Users.js");
+const Users = require("../database/Users");
 
 const checkExistUser = async (phoneNumber) => {
     return await Users.checkExistUser(phoneNumber);

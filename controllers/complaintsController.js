@@ -2,9 +2,10 @@ const moment = require("moment");
 const fs = require("fs");
 const path = require("path");
 const complaintsService = require("../services/complaintsService");
-const utils = require("./utils");
+const Validation = require("../lib/Validation");
 
-const complaintValidation = new utils.ComplaintValidation();
+
+const complaintValidation = new Validation.ComplaintValidation();
 
 const createNewComplaint = async (req, res) => {
     if (!req.isAuthenticated() || req.user.permission !== 1) {

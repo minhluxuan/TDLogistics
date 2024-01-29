@@ -10,16 +10,16 @@ const cron = require("cron");
 const cors = require("cors");
 const flash = require("express-flash");
 const passport = require("passport");
-const utils = require("./utils");
+const Auth = require("./lib/Auth");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const indexRouter = require('./routes/index');
-const usersRouter = require("./src/routes/usersRoute");
-const otpRouter = require("./src/routes/otpRoute");
-const ordersRouter = require("./src/routes/ordersRoute");
-const complaintsRouter = require("./src/routes/complaintsRoute");
-const businessRouter = require("./src/routes/businessRoute");
+const usersRouter = require("./routes/usersRoute");
+const otpRouter = require("./routes/otpRoute");
+const ordersRouter = require("./routes/ordersRoute");
+const complaintsRouter = require("./routes/complaintsRoute");
+const businessRouter = require("./routes/businessRoute");
 
 const dbOptions = {
 	host: process.env.HOST,
@@ -99,9 +99,9 @@ app.get("/destroy_session", (req, res) => {
 	});
 });
 
-passport.serializeUser(utils.setSession);
+passport.serializeUser(Auth.setSession);
 passport.deserializeUser((user, done) => {
-    utils.verifyPermission(user, done);
+    Auth.verifyPermission(user, done);
 });
 
 // catch 404 and forward to error handler
