@@ -1,6 +1,6 @@
 const mysql = require("mysql2");
 const moment = require("moment");
-const SQLutils = require("../lib/SQLutils");
+const SQLutils = require("../lib/dbUtils");
 
 const dbOptions = {
     host: process.env.HOST,
@@ -50,9 +50,8 @@ const getOrder = async (data) => {
     return result[0];
 };
 
-const createNewOrder = async (fields, values) => {
-    console.log(fields);
-    return await SQLutils.insert(pool, table, fields, values);
+const createNewOrder = async (newOrder) => {
+    return await SQLutils.insert(pool, table, Object.keys(newOrder), Object.values(newOrder));
 }
 
 const updateOrder = async (fields, values, conditionFields, conditionValues) => {
@@ -80,6 +79,62 @@ const cancelOrder = async (fields, values) => {
     return result[0];
 };
 
+const getDistrictPostalCode = async (district, province) => {
+    
+    const table = "district";
+    const query = `SELECT postal_code FROM ${table} WHERE district = ? AND province = ?`;
+    const result = await pool.query(query, [district, province]);
+    return result[0][0].postal_code;
+}
+
+
+const getProvincePostalCode = async (province) => {
+    const table = "province";
+    const query = `SELECT postal_code FROM ${table} WHERE province = ?`;
+    const result = await pool.query(query, [province]);
+    return result[0][0].postal_code;
+}
+
+// SELECT COUNT(*) as table_exists
+// FROM information_schema.tables
+// WHERE table_schema = 'tdlogistics'
+// AND table_name = 'agency';
+
+const findingManagedAgency = async (ward, district, province) => {
+
+    const postal_code = await getDistrictPostalCode(district, province);
+    if(!postal_code) {
+        throw new Error("Không tìm thấy mã bưu chính!");
+    } 
+    const agencyTable = postal_code + "_orders";
+    const checkAgencyExistQuery = `
+                SELECT COUNT(*) as table_exists
+                FROM information_schema.tables
+                WHERE table_schema = ?
+                AND table_name = ?;`
+    const checkAgencyExist = await pool.query(checkAgencyExistQuery, [process.env.DATABASE, agencyTable]);
+    if(checkAgencyExist[0][0].table_exists === 0) {
+        throw new Error("Không tồn tại bưu cục tại quận/huyện!");
+    }
+
+    const table = "ward";
+    const query = `SELECT agency_id FROM ${table} WHERE ward = ? AND district = ? AND province = ?`;
+    const result = await pool.query(query, [ward, district, province]);
+    console.log(result[0][0].agency_id);
+    if(!result[0][0].agency_id) {
+        throw new Error("Không tồn tại bưu cục tại xã/thị trấn!");
+    }
+    return {
+        agency_id: result[0][0].agency_id,
+        postal_code: postal_code
+    }
+}
+
+const createOrderInAgencyTable = async (newOrder, postal_code) => {
+    const agencyTable = postal_code + "_orders";
+    return await SQLutils.insert(pool, agencyTable, Object.keys(newOrder), Object.values(newOrder));
+}
+
 module.exports = {
     checkExistOrder,
     getAllOrders,
@@ -87,4 +142,8 @@ module.exports = {
     createNewOrder,
     updateOrder,
     cancelOrder,
+    getDistrictPostalCode,
+    getProvincePostalCode,
+    findingManagedAgency,
+    createOrderInAgencyTable
 };

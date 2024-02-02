@@ -16,14 +16,29 @@ const updateOrder = async (fields, values, conditionFields, conditionValues) => 
     return await Orders.updateOrder(fields, values, conditionFields, conditionValues);
 };
 
-const createNewOrder = async (fields, values) => {
-    return await Orders.createNewOrder(fields, values);
+const createNewOrder = async (newOrder) => {
+    return await Orders.createNewOrder(newOrder);
 }
 
 const cancelOrder = async (fields, values)=> {
     return await Orders.cancelOrder(fields, values);
 };
 
+const getDistrictPostalCode = async (district, province) => {
+    return await Orders.getDistrictPostalCode(district, province);
+}
+
+const getProvincePostalCode = async (province) => {
+    return await Orders.getProvincePostalCode(province);
+}
+
+const findingManagedAgency = async (ward, district, province) => {
+    return await Orders.findingManagedAgency(ward, district, province);
+}
+
+const createOrderInAgencyTable = async (newOrder, postalcode) => {
+    return await Orders.createOrderInAgencyTable(newOrder, postalcode);
+}
 
 module.exports = {
     checkExistOrder,
@@ -32,4 +47,8 @@ module.exports = {
     createNewOrder,
     updateOrder,
     cancelOrder,
+    getDistrictPostalCode,
+    getProvincePostalCode,
+    findingManagedAgency,
+    createOrderInAgencyTable,
 };

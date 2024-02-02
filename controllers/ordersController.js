@@ -1,8 +1,9 @@
 const moment = require("moment");
 const ordersService = require("../services/ordersService");
-const Validation = require("../lib/Validation");
-const libMap = require("../lib/Map");
+const Validation = require("../lib/validation");
+const libMap = require("../lib/map");
 
+const OrderValidation = new Validation.OrderValidation();
 
 const checkExistOrder = async (req, res) => {
     try {
@@ -29,8 +30,7 @@ const getOrder = async (req, res) => {
         });
     }
 
-    const ordersValidation = new Validation.OrderValidation(req.body);
-    const { error } = ordersValidation.validateFindingOrder();
+    const { error } = OrderValidation.validateFindingOrder(req.body);
 
     if (error) {
         return res.status(400).json({
@@ -60,28 +60,26 @@ const getOrder = async (req, res) => {
     }
 }
 
-const createNewOrder = async (req, res) => {
-    if(!req.isAuthenticated() || req.user.permisson < 1) {
-        return res.status(401).json({
-            error: true,
-            message: "Bạn không được phép truy cập tài nguyên này.",
-        });
-    }
+const calculateFee = async (req, res) => {
+    // if(!req.isAuthenticated() || req.user.permission !== 1) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: "Bạn không được phép truy cập tài nguyên này.",
+    //     });
+    // }
 
     try {
-        const userRequestValidation = new Validation.OrderValidation(req.body);
+        // const { error } = OrderValidation.validateCreatingOrder(req.body);
 
-        const { error } = userRequestValidation.validateCreatingOrder();
-
-        if (error) {
-            return res.status(400).json({
-                error: true,
-                message: "Thông tin không hợp lệ!",
-            });
-        }
+        // if (error) {
+        //     return res.status(400).json({
+        //         error: true,
+        //         //message: "Thông tin không hợp lệ!",
+        //         message: error.message,
+        //     });
+        // }
 
         const map = new libMap.Map();
-
         const source = {
             lat: req.body.lat_source,
             long: req.body.long_source,
@@ -91,55 +89,111 @@ const createNewOrder = async (req, res) => {
             lat: req.body.lat_destination,
             long: req.body.long_destination,
         };
-
         const distance = (await map.calculateDistance(source, destination)).distance;
-
         const fee = libMap.calculateFee(distance);
+        return res.status(200).json({
+            error: false,
+            fee: fee
+        });
 
-        const addressSource = await map.convertCoordinateToAddress(source);
-        const addressDestination = await map.convertCoordinateToAddress(destination);
+    } catch(error) {
+        return res.status(500).json({
+            error: true,
+            message: error.message,
+        });
+    }
+}
 
-        const keys = new Array();
-        const values = new Array();
+const createNewOrder = async (req, res) => {
+    // if(!req.isAuthenticated() || req.user.permisson < 1) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: "Bạn không được phép truy cập tài nguyên này.",
+    //     });
+    // }
 
-        for (const key in req.body) {
-            keys.push(key);
-            values.push(req.body[key]);
-        }
+    try {
+        //const OrderValidation = new Validation.OrderValidation();
+        // const { error } = OrderValidation.validateCreatingOrder(req.body);
+
+        // if (error) {
+        //     return res.status(400).json({
+        //         error: true,
+        //         //message: "Thông tin không hợp lệ!",
+        //         message: error.message,
+        //     });
+        // }
+        
+
+        const addressSource = req.body.address_source.split(',');
+        const provinceSource = addressSource[addressSource.length - 2].trimLeft(); //delete leading space
+        const districtSource = addressSource[addressSource.length - 3].trimLeft();
+        const wardSource = addressSource[addressSource.length - 4].trimLeft();
+        
+        
+
+        const { agency_id: managedAgency, postal_code } = await ordersService.findingManagedAgency(wardSource, districtSource, provinceSource);
+        
 
         const orderTime = new Date();
         const formattedOrderTime = moment(orderTime).format("YYYY-MM-DD HH:mm:ss");
-
         const orderId = "TD" + orderTime.getFullYear().toString() + orderTime.getMonth().toString() + orderTime.getDay().toString() + orderTime.getHours().toString() + orderTime.getMinutes().toString() + orderTime.getSeconds().toString() + orderTime.getMilliseconds().toString();
 
-        keys.push("user_id");
-        values.push(req.user.user_id);
 
-        keys.push("order_id");
-        values.push(orderId);
 
-        keys.push("order_time");
-        values.push(formattedOrderTime);
+        const newOrder = new Object({
+            //user_id: req.user.user_id || null,
+            user_id: "00000001",
+            order_id: orderId,
+            name_sender: req.body.name_sender,
+            phone_sender: req.body.phone_sender,
+            name_reciever: req.body.name_reciever,	
+            phone_reciever: req.body.phone_reciever,
+            order_time: orderTime,
+            mass: req.body.mass,
+            height: req.body.height,
+            width: req.body.width,
+            length: req.body.length,
+            coordinate_source: JSON.stringify([req.body.long_source, req.body.lat_source]),	
+            address_source: req.body.address_source,	
+            coordinate_dest: JSON.stringify([req.body.long_destination, req.body.lat_destination]),	 	
+            address_dest:req.body.address_dest,	
+            fee: req.body.fee,
+            COD: req.body.COD,
+            express_type: req.body.express_type
+        });
 
-        keys.push("fee");
-        values.push(fee);
-
-        keys.push("address_source");
-        values.push(addressSource);
-
-        keys.push("address_destination");
-        values.push(addressDestination);
-
-        const result = await ordersService.createNewOrder(keys, values);
+        await ordersService.createOrderInAgencyTable(newOrder, postal_code);
+        const result = await ordersService.createNewOrder(newOrder);
         
         return res.status(200).json({
             error: false,
+            data: result[0],
             message: "Tạo đơn hàng thành công.",
         });
     } catch (error) {
+
+        if(error.message === "Không tìm thấy mã bưu chính!") {
+            return res.status(404).json({
+                error: true,
+                message: error.message,
+            });
+        }
+        else if(error.message === "Không tồn tại bưu cục tại quận/huyện!") {
+            return res.status(404).json({
+                error: true,
+                message: error.message,
+            });
+        }
+        else if(error.message === "Không tồn tại bưu cục tại xã/thị trấn!") {
+            return res.status(404).json({
+                error: true,
+                message: error.message,
+            });
+        }
         return res.status(500).json({
             error: true,
-            message: error,
+            message: error.message,
         });
     }
 }
@@ -161,7 +215,7 @@ const updateOrder = async (req, res) => {
         });
     }
 
-    const { error } = new Validation.OrderValidation(req.body).validateUpdatingOrder();
+    const { error } = OrderValidation.validateUpdatingOrder(req.body);
     
     if (error) {
         return res.status(400).json({
@@ -202,19 +256,19 @@ const updateOrder = async (req, res) => {
 
         const distance = (await map.calculateDistance(source, destination)).distance;
 
-        const updatingFee = Map.calculateFee(distance);
+        const updatingFee = libMap.calculateFee(distance);
 
         const updatingAddressSource = await map.convertCoordinateToAddress(source);
         const updatingAddressDestination = await map.convertCoordinateToAddress(destination);
 
         await ordersService.updateOrder(["fee", "address_source", "address_destination"], [updatingFee, updatingAddressSource, updatingAddressDestination], ["order_id"], [orderId]);
 
-        res.status(200).json({
+        return res.status(200).json({
             error: false,
             message: "Cập nhật thành công.",
         });
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             error: true,
             message: error,
         });
@@ -231,7 +285,8 @@ const cancelOrder = async (req, res) => {
 
     const orderId = req.query.order_id;
 
-    const { error } = (new Validation.OrderValidation({ order_id: orderId })).validateCancelingOrder();
+   //const { error } = (new Validation.OrderValidation({ order_id: orderId })).validateCancelingOrder();
+    const { error } = OrderValidation.validateCancelingOrder({ order_id: orderId });
 
     if (error) {
         return res.status(401).json({

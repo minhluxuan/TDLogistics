@@ -1,5 +1,5 @@
 const mysql = require("mysql2");
-const SQLutils = require("../lib/SQLutils");
+const SQLutils = require("../lib/dbUtils");
 
 const dbOptions = {
     host: process.env.HOST,
@@ -52,6 +52,29 @@ const checkExistSession = async (sessionId) => {
   const result = await SQLutils.findOne(pool, sessionTable, ["session_id"], [sessionId]);
   return result.length > 0;
 };
+
+// const checkPostalCode = async (level, province, district, postal_code) => {
+// 	const successPostalCode = await checkExistAgency(["postal_code"], [postal_code]);
+// 	if (successPostalCode) {
+// 		return new Object({
+// 			success: false,
+// 			message: `Bưu cục/đại lý có mã bưu chính ${postal_code} đã tồn tại.`,
+// 		});
+// 	}
+
+// const getCustomerInfo = async (user_id, user_type) => {
+//     if(user_type === "bussiness_user") {
+//         const query = `SELECT business_name, phone_number FROM business_user WHERE business_id = ?`;
+//         const 
+//     } else if(user_type === "customer_user") {
+
+//     } else {
+//         return new Object({
+//             success: false,
+//             message: `Loại người dùng ${user_type} không tồn tại!`,
+//         });
+//     }
+// }
 
 module.exports = {
     checkExistUser,

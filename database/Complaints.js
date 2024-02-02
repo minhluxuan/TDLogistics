@@ -1,5 +1,5 @@
 const mysql = require("mysql2");
-const SQLutils = require("../lib/SQLutils");
+const SQLutils = require("../lib/dbUtils");
 
 const dbOptions = {
     host: process.env.HOST,

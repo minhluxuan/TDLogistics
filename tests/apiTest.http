@@ -64,15 +64,14 @@ POST http://localhost:5000/api/v1/orders/create
 content-type: application/json
 
 {
-    "order_id": "TD1254",
     "mass": 24,
     "height": 30,
     "width": 25,
     "length": 60,
-    "long_source": 103.44,
-    "lat_source": 72.4535,
-    "long_destination": 80.343,
-    "lat_destination": 34.55345
+    "long_source": 107.271526,
+    "lat_source": 10.477041,
+    "long_destination": 107.15671211,
+    "lat_destination": 10.525991
 }
 
 ###

@@ -1,11 +1,23 @@
 const usersService = require("../services/usersService");
+const Validation = require("../lib/validation");
 const dotenv = require("dotenv").config({ path: "../../.env" });
+
+const UserValidation = new Validation.UserValidation();
 
 const REGEX_NAME = new RegExp(process.env.REGEX_NAME);
 const REGEX_EMAIL = new RegExp(process.env.REGEX_EMAIL);
 const REGEX_PHONE_NUMBER = new RegExp(process.env.REGEX_PHONE_NUMBER);
 
 const checkExistUser = async (req, res) => {
+    const { error } = UserValidation.validateCheckingExistUser(req.body);
+
+	if (error) {
+		return res.status(400).json({
+			error: true,
+			message: "Thông tin không hợp lệ.",
+		});
+	}
+
     try {
         const existed = await usersService.checkExistUser(req.body["phone_number"]);
         return res.status(200).json({
@@ -29,27 +41,43 @@ const createNewUser = async (req, res) => {
         });
     }
 
-    const { fullname, email, phone_number } = req.body;
+    // const { fullname, email, phone_number } = req.body;
 
-    if (!REGEX_NAME.test(fullname.toLowerCase()) || !REGEX_EMAIL.test(email) || !REGEX_PHONE_NUMBER.test(phone_number) || phone_number !== req.user.phone_number) {
-        return res.status(400).json({
-            error: true,
-            message: "Thông tin đăng ký không hợp lệ!",
-        });
-    }
-
-    if (await usersService.checkExistUser(phone_number)) {
-        return res.status(400).json({
-            error: true,
-            message: "Số điện thoại đã tồn tại!",
-        });
-    }
+    // if (!REGEX_NAME.test(fullname.toLowerCase()) || !REGEX_EMAIL.test(email) || !REGEX_PHONE_NUMBER.test(phone_number) || phone_number !== req.user.phone_number) {
+    //     return res.status(400).json({
+    //         error: true,
+    //         message: "Thông tin đăng ký không hợp lệ!",
+    //     });
+    // }
 
     try {
+        const { error } = UserValidation.validateCreatingUser(req.body);
+
+        if (error) {
+            return res.status(400).json({
+                error: true,
+                message: "Thông tin không hợp lệ.",
+            });
+        }
+
+        if (await usersService.checkExistUser(phone_number)) {
+            return res.status(400).json({
+                error: true,
+                message: "Số điện thoại đã tồn tại!",
+            });
+        }
+
+    
+        // const newUser = {
+        //     fullname: fullname,
+        //     email: email,
+        //     phoneNumber: phone_number,
+        // }
+
         const newUser = {
-            fullname: fullname,
-            email: email,
-            phoneNumber: phone_number,
+            fullname: req.body.fullname,
+            email: req.body.email,
+            phoneNumber: req.body.phone_number,
         }
 
         await usersService.createNewUser(newUser);
@@ -72,7 +100,7 @@ const createNewUser = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             error: true,
-            message: error,
+            message: error.message,
         });
     }
 }
@@ -87,7 +115,7 @@ const getAllUsers = async (req, res) => {
 
     try {
         const users = await usersService.getAllUsers();
-        res.json({
+        return res.status(200).json({
             error: false,
             data: users,
             message: "Lấy thông tin thành công!",
@@ -190,7 +218,7 @@ const updateUserInfo = async (req, res) => {
                 }
             }
             else if (key === "avatar") {
-                
+                //Còn trống
             }
         }
     }

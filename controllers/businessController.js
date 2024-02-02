@@ -1,5 +1,5 @@
 const businessService = require ("../services/businessService");
-const Validation = require("../lib/Validation");
+const Validation = require("../lib/validation");
 const Hash = require("../lib/Hash");
 
 const businessValidation = new Validation.BusinessValidation();
