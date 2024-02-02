@@ -114,15 +114,15 @@ const createNewOrder = async (req, res) => {
 
     try {
         //const OrderValidation = new Validation.OrderValidation();
-        // const { error } = OrderValidation.validateCreatingOrder(req.body);
+        const { error } = OrderValidation.validateCreatingOrder(req.body);
 
-        // if (error) {
-        //     return res.status(400).json({
-        //         error: true,
-        //         //message: "Thông tin không hợp lệ!",
-        //         message: error.message,
-        //     });
-        // }
+        if (error) {
+            return res.status(400).json({
+                error: true,
+                message: "Thông tin không hợp lệ!",
+                message1: error.message,
+            });
+        }
         
 
         const addressSource = req.body.address_source.split(',');
