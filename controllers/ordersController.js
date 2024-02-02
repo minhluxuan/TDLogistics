@@ -79,18 +79,7 @@ const calculateFee = async (req, res) => {
         //     });
         // }
 
-        const map = new libMap.Map();
-        const source = {
-            lat: req.body.lat_source,
-            long: req.body.long_source,
-        };
-
-        const destination = {
-            lat: req.body.lat_destination,
-            long: req.body.long_destination,
-        };
-        const distance = (await map.calculateDistance(source, destination)).distance;
-        const fee = libMap.calculateFee(distance);
+        const fee = await ordersService.calculateFee(req.body.address_source, req.body.address_dest);
         return res.status(200).json({
             error: false,
             fee: fee
@@ -113,14 +102,12 @@ const createNewOrder = async (req, res) => {
     // }
 
     try {
-        //const OrderValidation = new Validation.OrderValidation();
         const { error } = OrderValidation.validateCreatingOrder(req.body);
 
         if (error) {
             return res.status(400).json({
                 error: true,
                 message: "Thông tin không hợp lệ!",
-                message1: error.message,
             });
         }
         
@@ -138,7 +125,7 @@ const createNewOrder = async (req, res) => {
         const orderTime = new Date();
         const formattedOrderTime = moment(orderTime).format("YYYY-MM-DD HH:mm:ss");
         const orderId = "TD" + orderTime.getFullYear().toString() + orderTime.getMonth().toString() + orderTime.getDay().toString() + orderTime.getHours().toString() + orderTime.getMinutes().toString() + orderTime.getSeconds().toString() + orderTime.getMilliseconds().toString();
-
+        const fee = await ordersService.calculateFee(req.body.address_source, req.body.address_dest);
 
 
         const newOrder = new Object({
@@ -158,7 +145,7 @@ const createNewOrder = async (req, res) => {
             address_source: req.body.address_source,	
             coordinate_dest: JSON.stringify([req.body.long_destination, req.body.lat_destination]),	 	
             address_dest:req.body.address_dest,	
-            fee: req.body.fee,
+            fee: fee,
             COD: req.body.COD,
             express_type: req.body.express_type
         });
@@ -326,4 +313,5 @@ module.exports = {
     createNewOrder,
     updateOrder,
     cancelOrder,
+    calculateFee,
 }

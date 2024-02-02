@@ -1,7 +1,7 @@
 const mysql = require("mysql2");
 const moment = require("moment");
 const SQLutils = require("../lib/dbUtils");
-
+const libMap = require("../lib/map");
 const dbOptions = {
     host: process.env.HOST,
     port: process.env.DBPOST,
@@ -145,5 +145,5 @@ module.exports = {
     getDistrictPostalCode,
     getProvincePostalCode,
     findingManagedAgency,
-    createOrderInAgencyTable
+    createOrderInAgencyTable,
 };

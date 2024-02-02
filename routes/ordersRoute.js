@@ -6,6 +6,7 @@ const router = express.Router();
 router.get("/check", ordersController.checkExistOrder);
 router.post("/search", ordersController.getOrder);
 router.post("/create", ordersController.createNewOrder);
+router.post("/calculatefee", ordersController.calculateFee);
 router.patch("/update", ordersController.updateOrder);
 router.delete("/cancel", ordersController.cancelOrder);
 
