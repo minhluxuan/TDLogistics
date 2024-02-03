@@ -32,3 +32,39 @@ Content-Type: application/json
     "address_dest": "20 Lý Thái Tổ, Phường Mỹ Long, Thành phố Long Xuyên, Tỉnh An Giang, Việt Nam"
 
 }
+
+###
+
+GET http://localhost:5000/api/v1/orders/get_status
+Content-Type: application/json
+
+{
+    "order_id" : "TD20241521249904"
+}
+
+###
+
+GET http://localhost:5000/api/v1/orders/search_orderid
+Content-Type: application/json
+
+{
+    "order_id" : "TD20241521249904"
+}
+
+###
+
+GET http://localhost:5000/api/v1/orders/search_userid
+Content-Type: application/json
+
+{
+    
+}
+
+###
+
+GET http://localhost:5000/api/v1/orders/search_userid
+Content-Type: application/json
+
+{
+    "status_code": 4
+}

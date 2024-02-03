@@ -17,45 +17,77 @@ const checkExistOrder = async (req, res) => {
     catch (error) {
         return res.status(500).json({
             error: true,
-            message: error,
+            message: error.message,
         });
     }
 }
 
-const getOrder = async (req, res) => {
-    if(!req.isAuthenticated() || req.user.permission !== 1) {
-        return res.status(401).json({
-            error: true,
-            message: "Bạn không được phép truy cập tài nguyên này.",
-        });
-    }
-
-    const { error } = OrderValidation.validateFindingOrder(req.body);
-
-    if (error) {
-        return res.status(400).json({
-            error: true,
-            message: "Thông tin không hợp lệ!",
-        });
-    }
-
-    req.body.user_id = req.user.user_id;
-    
-    if (req.query.order_id) {
-        req.body.order_id = req.query.order_id;
-    }
-
+const getOrderByUserID = async (req, res) => {
+    // if(!req.isAuthenticated() || req.user.permission !== 1) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: "Bạn không được phép truy cập tài nguyên này.",
+    //     });
+    // }
     try {
-        const orders = await ordersService.getOrder(req.body);
+        const { error } = OrderValidation.validateFindingOrderByUserID(req.body);
+
+        if (error) {
+            return res.status(400).json({
+                error: true,
+                message: "Thông tin không hợp lệ!",
+            });
+        }
+
+        //const userID = req.user.user_id;
+        const userID = "00000001";
+        const statusCode = (req.body.status_code ? req.body.status_code : null);
+
+        const result = await ordersService.getOrdersByUserID(userID, statusCode);
         return res.status(200).json({
             error: false,
-            data: orders,
-            message: "Lấy thông tin đơn hàng thành công!",
-        }); 
+            data: result,
+            message: "Lấy thông tin thành công!"
+        });
+
+        
     } catch (error) {
         return res.status(500).json({
             error: true,
-            message: error,
+            message: error.message,
+        });
+    }
+    
+}
+
+const getOrderByOrderID = async (req, res) => {
+    // if(!req.isAuthenticated() || req.user.permission !== 1) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: "Bạn không được phép truy cập tài nguyên này.",
+    //     });
+    // }
+    try {
+        const { error } = OrderValidation.validateFindingOrderByOrderID(req.body);
+
+        if (error) {
+            return res.status(400).json({
+                error: true,
+                message: "Thông tin không hợp lệ!",
+            });
+        }
+        const result = await ordersService.getOrderByOrderID(req.body.order_id);
+        return res.status(200).json({
+            error: false,
+            data: result,
+            message: "Lấy thông tin thành công!"
+        });
+
+        
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: error.message,
         });
     }
 }
@@ -262,6 +294,39 @@ const updateOrder = async (req, res) => {
     }
 };
 
+const getOrderStatus = async (req, res) => {
+    // if(!req.isAuthenticated() || req.user.permisson < 1) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: "Bạn không được phép truy cập tài nguyên này.",
+    //     });
+    // }
+    try {
+
+        const { error } = OrderValidation.validateFindingOrderStatus(req.body);
+
+        if (error) {
+            return res.status(400).json({
+                error: true,
+                message: "Thông tin không hợp lệ!",
+            });
+        }
+        
+        const result = await ordersService.getOrderStatus(req.body.order_id);
+        return res.status(200).json({
+            error: false,
+            status_code: result.status_code,
+            status_message: result.status_message
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: error.message,
+        });
+    }
+}
+
 const cancelOrder = async (req, res) => {
     if (!req.isAuthenticated() || req.user.permission !== 1) {
         return res.status(401).json({
@@ -309,9 +374,11 @@ const cancelOrder = async (req, res) => {
 
 module.exports = {
     checkExistOrder,
-    getOrder,
+    getOrderByUserID,
+    getOrderByOrderID,
     createNewOrder,
     updateOrder,
     cancelOrder,
     calculateFee,
+    getOrderStatus,
 }

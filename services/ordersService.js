@@ -5,13 +5,13 @@ const checkExistOrder = async (order_id) => {
     return Orders.checkExistOrder(order_id);
 };
 
-const getAllOrders = async () => {
-    return await Orders.getAllOrders();
-};
+const getOrdersByUserID = async (user_id, status_code = null) => {
+    return await Orders.getOrdersByUserID(user_id, status_code);
+}
 
-const getOrder = async (data) => {
-    return await Orders.getOrder(data);
-};
+const getOrderByOrderID = async (order_id) => {
+    return await Orders.getOrderByOrderID(order_id);
+}
 
 const updateOrder = async (fields, values, conditionFields, conditionValues) => {
     return await Orders.updateOrder(fields, values, conditionFields, conditionValues);
@@ -60,10 +60,14 @@ const calculateFee = async (address_source, address_dest) => {
     return fee;
 }
 
+const getOrderStatus = async (order_id) => {
+    return await Orders.getOrderStatus(order_id);
+}
+
 module.exports = {
     checkExistOrder,
-    getAllOrders,
-    getOrder,
+    getOrdersByUserID,
+    getOrderByOrderID,
     createNewOrder,
     updateOrder,
     cancelOrder,
@@ -72,4 +76,5 @@ module.exports = {
     findingManagedAgency,
     createOrderInAgencyTable,
     calculateFee,
+    getOrderStatus,
 };
