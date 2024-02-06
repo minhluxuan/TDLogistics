@@ -1,6 +1,7 @@
 const moment = require("moment");
 const ordersService = require("../services/ordersService");
 const Validation = require("../lib/validation");
+const servicesFee = require("../lib/servicesFee");
 const libMap = require("../lib/map");
 
 const OrderValidation = new Validation.OrderValidation();
@@ -142,74 +143,186 @@ const createNewOrder = async (req, res) => {
                 message: "Thông tin không hợp lệ!",
             });
         }
+
+        const serviceType = req.body.service_type;
         
+        if(serviceType === 1) {
+            const addressSource = req.body.address_source.split(',');
+            const provinceSource = addressSource[addressSource.length - 2].trimLeft(); //delete leading space
+            const districtSource = addressSource[addressSource.length - 3].trimLeft();
+            const wardSource = addressSource[addressSource.length - 4].trimLeft();
+            
+            
 
-        const addressSource = req.body.address_source.split(',');
-        const provinceSource = addressSource[addressSource.length - 2].trimLeft(); //delete leading space
-        const districtSource = addressSource[addressSource.length - 3].trimLeft();
-        const wardSource = addressSource[addressSource.length - 4].trimLeft();
+            const { agency_id: managedAgency, postal_code } = await ordersService.findingManagedAgency(wardSource, districtSource, provinceSource);
+            
+
+            const orderTime = new Date();
+            const formattedOrderTime = moment(orderTime).format("YYYY-MM-DD HH:mm:ss");
+            const orderId = "TD" + orderTime.getFullYear().toString() + orderTime.getMonth().toString() + orderTime.getDay().toString() + orderTime.getHours().toString() + orderTime.getMinutes().toString() + orderTime.getSeconds().toString() + orderTime.getMilliseconds().toString();
+            const fee = await servicesFee.calculateExpressFee(serviceType, req.body.address_source, req.body.address_dest);
+
+
+            const newOrder = new Object({
+                //user_id: req.user.user_id || null,
+                user_id: "00000001",
+                order_id: orderId,
+                name_sender: req.body.name_sender,
+                phone_sender: req.body.phone_sender,
+                name_reciever: req.body.name_reciever,	
+                phone_reciever: req.body.phone_reciever,
+                order_time: formattedOrderTime,
+                mass: req.body.mass,
+                height: req.body.height,
+                width: req.body.width,
+                length: req.body.length,
+                coordinate_source: JSON.stringify([req.body.long_source, req.body.lat_source]),	
+                address_source: req.body.address_source,	
+                coordinate_dest: JSON.stringify([req.body.long_destination, req.body.lat_destination]),	 	
+                address_dest:req.body.address_dest,	
+                fee: fee,
+                COD: req.body.COD,
+                service_type: serviceType
+            });
+
+            // await ordersService.createOrderInAgencyTable(newOrder, postal_code);
+            // const result = await ordersService.createNewOrder(newOrder);
+            
+            return res.status(200).json({
+                error: false,
+                data: result[0],
+                message: "Tạo đơn hàng thành công.",
+            });
+        } else if(serviceType === 2) {
+            const addressSource = req.body.address_source.split(',');
+            const provinceSource = addressSource[addressSource.length - 2].trimLeft(); //delete leading space
+            const districtSource = addressSource[addressSource.length - 3].trimLeft();
+            const wardSource = addressSource[addressSource.length - 4].trimLeft();
+            
+            const addressDest = req.body.address_dest.split(',');
+            const provinceDest = addressDest[addressDest.length - 2].trimLeft();
+            if(provinceDest !== provinceSource) {
+                const error = new Error("Đơn hàng phải được giao nội tỉnh");
+                error.status = 400;
+                throw error;
+            }
+            
+            const { agency_id: managedAgency, postal_code } = await ordersService.findingManagedAgency(wardSource, districtSource, provinceSource);
+            
+
+            const orderTime = new Date();
+            const formattedOrderTime = moment(orderTime).format("YYYY-MM-DD HH:mm:ss");
+            const orderId = "TD" + orderTime.getFullYear().toString() + orderTime.getMonth().toString() + orderTime.getDay().toString() + orderTime.getHours().toString() + orderTime.getMinutes().toString() + orderTime.getSeconds().toString() + orderTime.getMilliseconds().toString();
+            const fee = await servicesFee.calculateExpressFee(serviceType, req.body.address_source, req.body.address_dest);
+
+            const newOrder = new Object({
+                //user_id: req.user.user_id || null,
+                user_id: "00000001",
+                order_id: orderId,
+                name_sender: req.body.name_sender,
+                phone_sender: req.body.phone_sender,
+                name_reciever: req.body.name_reciever,	
+                phone_reciever: req.body.phone_reciever,
+                order_time: formattedOrderTime,
+                mass: req.body.mass,
+                height: req.body.height,
+                width: req.body.width,
+                length: req.body.length,
+                coordinate_source: JSON.stringify([req.body.long_source, req.body.lat_source]),	
+                address_source: req.body.address_source,	
+                coordinate_dest: JSON.stringify([req.body.long_destination, req.body.lat_destination]),	 	
+                address_dest:req.body.address_dest,	
+                fee: fee,
+                COD: req.body.COD,
+                service_type: serviceType
+            });
+
+
+
+            await ordersService.createOrderInAgencyTable(newOrder, postal_code);
+            const result = await ordersService.createNewOrder(newOrder);
+
+            const shipperList = await ordersService.distributeOrder(managedAgency, req.body.address_source);
+            const standardDeliveryTime = moment(orderTime).add(4, "hours").format("YYYY-MM-DD HH:mm:ss");
+
+            return res.status(200).json({
+                error: false,
+                result: result[0],
+                shipperList: shipperList,
+                deadlineTime: standardDeliveryTime,
+                message: "Tạo đơn giao nhanh nội tỉnh thành công!"
+            });
+
+        } else if(serviceType === 3) {
+            const addressSource = req.body.address_source.split(',');
+            const provinceSource = addressSource[addressSource.length - 2].trimLeft(); //delete leading space
+            const districtSource = addressSource[addressSource.length - 3].trimLeft();
+            const wardSource = addressSource[addressSource.length - 4].trimLeft();
+            
+            const addressDest = req.body.address_dest.split(',');
+            const provinceDest = addressDest[addressDest.length - 2].trimLeft();
+            if(provinceDest !== provinceSource) {
+                const error = new Error("Đơn hàng phải được giao nội tỉnh");
+                error.status = 400;
+                throw error;
+            }
+
+            const { agency_id: managedAgency, postal_code } = await ordersService.findingManagedAgency(wardSource, districtSource, provinceSource);
+            
+
+            const orderTime = new Date();
+            const formattedOrderTime = moment(orderTime).format("YYYY-MM-DD HH:mm:ss");
+            const orderId = "TD" + orderTime.getFullYear().toString() + orderTime.getMonth().toString() + orderTime.getDay().toString() + orderTime.getHours().toString() + orderTime.getMinutes().toString() + orderTime.getSeconds().toString() + orderTime.getMilliseconds().toString();
+            const fee = await servicesFee.calculateExpressFee(serviceType, req.body.address_source, req.body.address_dest);
+
+            const newOrder = new Object({
+                //user_id: req.user.user_id || null,
+                user_id: "00000001",
+                order_id: orderId,
+                name_sender: req.body.name_sender,
+                phone_sender: req.body.phone_sender,
+                name_reciever: req.body.name_reciever,	
+                phone_reciever: req.body.phone_reciever,
+                order_time: formattedOrderTime,
+                mass: req.body.mass,
+                height: req.body.height,
+                width: req.body.width,
+                length: req.body.length,
+                coordinate_source: JSON.stringify([req.body.long_source, req.body.lat_source]),	
+                address_source: req.body.address_source,	
+                coordinate_dest: JSON.stringify([req.body.long_destination, req.body.lat_destination]),	 	
+                address_dest:req.body.address_dest,	
+                fee: fee,
+                COD: req.body.COD,
+                service_type: serviceType
+            });
+
+
+
+            await ordersService.createOrderInAgencyTable(newOrder, postal_code);
+            const result = await ordersService.createNewOrder(newOrder);
+
+            const shipperList = await ordersService.distributeOrder(managedAgency, req.body.address_source);
+            const standardDeliveryTime = moment(orderTime).add(2, "hours").format("YYYY-MM-DD HH:mm:ss");
+
+            return res.status(200).json({
+                error: false,
+                result: result[0],
+                shipperList: shipperList,
+                standardDeliveryTime: standardDeliveryTime,
+                message: "Tạo đơn giao hỏa tốc nội tỉnh thành công!"
+            });
+        } else {
+            const error = new Error("Không tồn tại phương thức vận chuyển");
+            error.status = 400;
+            throw error;
+        }
+
         
-        
-
-        const { agency_id: managedAgency, postal_code } = await ordersService.findingManagedAgency(wardSource, districtSource, provinceSource);
-        
-
-        const orderTime = new Date();
-        const formattedOrderTime = moment(orderTime).format("YYYY-MM-DD HH:mm:ss");
-        const orderId = "TD" + orderTime.getFullYear().toString() + orderTime.getMonth().toString() + orderTime.getDay().toString() + orderTime.getHours().toString() + orderTime.getMinutes().toString() + orderTime.getSeconds().toString() + orderTime.getMilliseconds().toString();
-        const fee = await ordersService.calculateFee(req.body.address_source, req.body.address_dest);
-
-
-        const newOrder = new Object({
-            //user_id: req.user.user_id || null,
-            user_id: "00000001",
-            order_id: orderId,
-            name_sender: req.body.name_sender,
-            phone_sender: req.body.phone_sender,
-            name_reciever: req.body.name_reciever,	
-            phone_reciever: req.body.phone_reciever,
-            order_time: orderTime,
-            mass: req.body.mass,
-            height: req.body.height,
-            width: req.body.width,
-            length: req.body.length,
-            coordinate_source: JSON.stringify([req.body.long_source, req.body.lat_source]),	
-            address_source: req.body.address_source,	
-            coordinate_dest: JSON.stringify([req.body.long_destination, req.body.lat_destination]),	 	
-            address_dest:req.body.address_dest,	
-            fee: fee,
-            COD: req.body.COD,
-            express_type: req.body.express_type
-        });
-
-        await ordersService.createOrderInAgencyTable(newOrder, postal_code);
-        const result = await ordersService.createNewOrder(newOrder);
-        
-        return res.status(200).json({
-            error: false,
-            data: result[0],
-            message: "Tạo đơn hàng thành công.",
-        });
     } catch (error) {
 
-        if(error.message === "Không tìm thấy mã bưu chính!") {
-            return res.status(404).json({
-                error: true,
-                message: error.message,
-            });
-        }
-        else if(error.message === "Không tồn tại bưu cục tại quận/huyện!") {
-            return res.status(404).json({
-                error: true,
-                message: error.message,
-            });
-        }
-        else if(error.message === "Không tồn tại bưu cục tại xã/thị trấn!") {
-            return res.status(404).json({
-                error: true,
-                message: error.message,
-            });
-        }
+        const status = (error.status || 500);
+        console.log(status);
         return res.status(500).json({
             error: true,
             message: error.message,

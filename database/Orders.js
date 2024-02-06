@@ -2,7 +2,6 @@ const mysql = require("mysql2");
 const moment = require("moment");
 const SQLutils = require("../lib/dbUtils");
 const libMap = require("../lib/map");
-const { query } = require("express");
 const dbOptions = {
     host: process.env.HOST,
     port: process.env.DBPOST,
@@ -59,7 +58,7 @@ const getOrderByOrderID = async (order_id) => {
         address_dest: row.address_dest,	
         fee: row.fee,
         COD: row.COD,
-        express_type: (row.express_type === 1 ? "Giao hàng tiêu chuẩn" : "Giao hàng nhanh"),	
+        service_type: (row.service_type === 1 ? "Giao hàng tiêu chuẩn" : "Giao hàng nhanh"),	
         status_message: status_message
     });
     return Order;
@@ -189,7 +188,9 @@ const getOrderStatus = async (order_id) => {
     const [row] = await pool.query(statusQuery, [order_id]);
 
     if(row.length <= 0) {
-        throw new Error("Không tồn tại đơn hàng!");
+        const error = new Error("Không tồn tại đơn hàng!");
+        error.status = 404;
+        throw error;
     }
 
     const { status_code, journey } = row[0];
@@ -214,7 +215,7 @@ const getOrderStatus = async (order_id) => {
                 statusMessage = statusMessage + "Đang được xử lí bởi " + agencyName;
                 break;
             } catch (error) {
-                throw new Error ("Không tìm thấy bưu cục");
+                throw new Error (error);
             }
             
         case 3:
@@ -227,7 +228,7 @@ const getOrderStatus = async (order_id) => {
                 statusMessage = statusMessage + "Đã tới bưu cục " + agencyName;
                 break;
             } catch (error) {
-                throw new Error ("Không tìm thấy bưu cục");
+                throw new Error (error);
             }
         case 5:
             try {
@@ -236,7 +237,7 @@ const getOrderStatus = async (order_id) => {
                 statusMessage = statusMessage + "Đã rời bưu cục " + agencyName;
                 break;
             } catch (error) {
-                throw new Error ("Không tìm thấy bưu cục");
+                throw new Error (error);
             }
         case 6:
             statusMessage = statusMessage + "Đang giao tới người nhận";
@@ -260,13 +261,15 @@ const getOrderStatus = async (order_id) => {
                 statusMessage = statusMessage + "Hoàn hàng thất bại, kiện hàng đang ở " + agencyName;
                 break;
             } catch (error) {
-                throw new Error ("Không tìm thấy bưu cục");
+                throw new Error (error);
             }
         case 12:
             statusMessage = statusMessage + "Đã hủy yêu cầu vận chuyển";
             break;
         default:
-            throw new Error ("Trạng thái không xác định");
+            const error = new Error ("Trạng thái không xác định");
+            error.status = 400;
+            throw error;
     }
     return {
         status_code: status_code,
@@ -275,6 +278,46 @@ const getOrderStatus = async (order_id) => {
     
 
     
+}
+
+const distributeOrder = async (agency_id, address_source) => {
+    const staffTable = "staff";
+    const staffRole = "Shipper";
+    const activeStatus = 1;
+    const map = new libMap.Map();
+    
+    const rows = await SQLutils.find(pool, staffTable, ["agency_id", "role", "active"], [agency_id, staffRole, activeStatus]);
+    const source = await map.convertAddressToCoordinate(address_source);
+    let shipperListByMinDistance = [];
+
+    for (const row of rows) {
+        let { staff_id, fullname, last_location } = row;
+        last_location = JSON.parse(last_location);
+        const shipperCoordinate = {
+            lat: last_location[0],
+            long: last_location[1]
+        }
+        
+        const distance = (await map.calculateDistance(source, shipperCoordinate)).distance;
+        console.log(distance);
+        shipperListByMinDistance.push({
+            staff_id,
+            fullname,
+            distance,
+        });
+    }
+    shipperListByMinDistance.sort((a, b) => a.distance - b.distance);
+
+
+    const selectedStaffid = shipperListByMinDistance[0].staff_id;
+    const selectedStaffname = shipperListByMinDistance[0].fullname;
+
+    return {
+        selectedStaffid: selectedStaffid,
+        selectedStaffname: selectedStaffname,
+        shipperList: shipperListByMinDistance
+    }
+
 }
 
 module.exports = {
@@ -289,4 +332,5 @@ module.exports = {
     findingManagedAgency,
     createOrderInAgencyTable,
     getOrderStatus,
+    distributeOrder
 };
