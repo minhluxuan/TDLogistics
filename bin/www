@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('tdlogistics:server');
 var http = require('http');
+const Socket = require("socket.io");
 
 /**
  * Get port from environment and store in Express.
@@ -24,6 +25,23 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
+
+const io = Socket(server, {
+	cors: {
+		origin: "*",
+		methods: ["GET", "POST"],
+	},
+});
+
+let ioInitialized = false; // Bản ghi tạm thời
+
+io.on("connection", () => {
+    if (!ioInitialized) {
+        // Kích hoạt sự kiện "ioInitialize" chỉ một lần
+        require('../lib/eventManager').emit("ioInitialize", io);
+        ioInitialized = true; // Đánh dấu là đã kích hoạt
+    }
+});
 
 server.listen(port);
 server.on('error', onError);

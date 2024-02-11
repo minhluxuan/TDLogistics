@@ -12,4 +12,6 @@ router.post("/calculatefee", ordersController.calculateFee);
 router.patch("/update", ordersController.updateOrder);
 router.delete("/cancel", ordersController.cancelOrder);
 
+router.get('/', ordersController.getOrders);
+
 module.exports = router;

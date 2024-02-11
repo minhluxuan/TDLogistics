@@ -289,7 +289,7 @@ const distributeOrder = async (agency_id, address_source) => {
     const rows = await SQLutils.find(pool, staffTable, ["agency_id", "role", "active"], [agency_id, staffRole, activeStatus]);
     const source = await map.convertAddressToCoordinate(address_source);
     let shipperListByMinDistance = [];
-
+    console.log(rows);
     for (const row of rows) {
         let { staff_id, fullname, last_location } = row;
         last_location = JSON.parse(last_location);

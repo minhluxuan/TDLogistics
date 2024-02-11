@@ -3,6 +3,24 @@ const ordersService = require("../services/ordersService");
 const Validation = require("../lib/validation");
 const servicesFee = require("../lib/servicesFee");
 const libMap = require("../lib/map");
+const eventManager = require("../lib/eventManager");
+
+eventManager.once("ioInitialize", (io) => {
+    eventManager.on("notifyNewOrder", (order) => {
+        io.emit("notifyNewOrder", order);
+    });
+    // Thiết lập trình xử lý sự kiện 'connection' và 'disconnect' trong io
+    io.on("connection", (socket) => {
+        console.log("Socket connected with ID: ", socket.id);
+        socket.on("disconnect", () => {
+            console.log("Socket disconnected with ID: ", socket.id);
+        });
+    });
+});
+
+const getOrders = async (req, res) => {
+    res.render("order");
+}
 
 const OrderValidation = new Validation.OrderValidation();
 
@@ -147,11 +165,10 @@ const createNewOrder = async (req, res) => {
         const serviceType = req.body.service_type;
         
         if(serviceType === 1) {
-            const addressSource = req.body.address_source.split(',');
-            const provinceSource = addressSource[addressSource.length - 2].trimLeft(); //delete leading space
-            const districtSource = addressSource[addressSource.length - 3].trimLeft();
-            const wardSource = addressSource[addressSource.length - 4].trimLeft();
-            
+            const provinceSource = req.body.province_source; //delete leading space
+            const districtSource = req.body.district_source;;
+            const wardSource = req.body.ward_source;
+            const addressSource = req.body.detail_source + ", " + wardSource + ", " + districtSource + ", " + provinceSource; 
             
 
             const { agency_id: managedAgency, postal_code } = await ordersService.findingManagedAgency(wardSource, districtSource, provinceSource);
@@ -185,22 +202,24 @@ const createNewOrder = async (req, res) => {
                 service_type: serviceType
             });
 
-            // await ordersService.createOrderInAgencyTable(newOrder, postal_code);
-            // const result = await ordersService.createNewOrder(newOrder);
+            await ordersService.createOrderInAgencyTable(newOrder, postal_code);
+            const result = await ordersService.createNewOrder(newOrder);
             
+            eventManager.emit("notifyNewOrder", newOrder);
+
             return res.status(200).json({
                 error: false,
                 data: result[0],
                 message: "Tạo đơn hàng thành công.",
             });
         } else if(serviceType === 2) {
-            const addressSource = req.body.address_source.split(',');
-            const provinceSource = addressSource[addressSource.length - 2].trimLeft(); //delete leading space
-            const districtSource = addressSource[addressSource.length - 3].trimLeft();
-            const wardSource = addressSource[addressSource.length - 4].trimLeft();
+            const provinceSource = req.body.province_source; //delete leading space
+            const districtSource = req.body.district_source;;
+            const wardSource = req.body.ward_source;
+            const addressSource = req.body.detail_source + ", " + wardSource + ", " + districtSource + ", " + provinceSource; 
             
-            const addressDest = req.body.address_dest.split(',');
-            const provinceDest = addressDest[addressDest.length - 2].trimLeft();
+            
+            const provinceDest = req.body.province_dest;
             if(provinceDest !== provinceSource) {
                 const error = new Error("Đơn hàng phải được giao nội tỉnh");
                 error.status = 400;
@@ -245,6 +264,8 @@ const createNewOrder = async (req, res) => {
             const shipperList = await ordersService.distributeOrder(managedAgency, req.body.address_source);
             const standardDeliveryTime = moment(orderTime).add(4, "hours").format("YYYY-MM-DD HH:mm:ss");
 
+            eventManager.emit("notifyNewOrder", newOrder);
+
             return res.status(200).json({
                 error: false,
                 result: result[0],
@@ -254,13 +275,13 @@ const createNewOrder = async (req, res) => {
             });
 
         } else if(serviceType === 3) {
-            const addressSource = req.body.address_source.split(',');
-            const provinceSource = addressSource[addressSource.length - 2].trimLeft(); //delete leading space
-            const districtSource = addressSource[addressSource.length - 3].trimLeft();
-            const wardSource = addressSource[addressSource.length - 4].trimLeft();
+            const provinceSource = req.body.province_source; //delete leading space
+            const districtSource = req.body.district_source;;
+            const wardSource = req.body.ward_source;
+            const addressSource = req.body.detail_source + ", " + wardSource + ", " + districtSource + ", " + provinceSource; 
             
-            const addressDest = req.body.address_dest.split(',');
-            const provinceDest = addressDest[addressDest.length - 2].trimLeft();
+            
+            const provinceDest = req.body.province_dest;
             if(provinceDest !== provinceSource) {
                 const error = new Error("Đơn hàng phải được giao nội tỉnh");
                 error.status = 400;
@@ -304,6 +325,8 @@ const createNewOrder = async (req, res) => {
 
             const shipperList = await ordersService.distributeOrder(managedAgency, req.body.address_source);
             const standardDeliveryTime = moment(orderTime).add(2, "hours").format("YYYY-MM-DD HH:mm:ss");
+
+            eventManager.emit("notifyNewOrder", newOrder);
 
             return res.status(200).json({
                 error: false,
@@ -487,6 +510,7 @@ const cancelOrder = async (req, res) => {
 
 module.exports = {
     checkExistOrder,
+    getOrders,
     getOrderByUserID,
     getOrderByOrderID,
     createNewOrder,
