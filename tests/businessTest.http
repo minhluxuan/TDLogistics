@@ -1,0 +1,25 @@
+POST http://localhost:9000/api/v1/business/login
+Content-Type: application/json
+
+{
+    "username": "minhluxuan",
+    "password": "AlphaSolutions@alphasolutions2k24"
+}
+
+###
+
+GET http://localhost:9000/api/v1/business
+
+###
+
+PATCH http://localhost:9000/api/v1/business/update_password
+Content-Type: application/json
+
+{
+    "new_password": "AlphaSolutions@alphasolutions2k24",
+    "confirm_password": "AlphaSolutions@alphasolutions2k24"
+}
+
+###
+
+GET http://localhost:9000/get_session

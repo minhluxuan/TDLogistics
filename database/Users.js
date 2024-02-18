@@ -10,78 +10,44 @@ const dbOptions = {
 };
 
 const table = "customer_user";
-const sessionTable="sessions";
 
 const pool = mysql.createPool(dbOptions).promise();
 
-const checkExistUser = async (phoneNumber) => {
-    const result = await SQLutils.findOne(pool, table, ["phone"], [phoneNumber]);
+const checkExistUser = async (conditions) => {
+    const fields = Object.keys(conditions);
+    const values = Object.values(conditions);
+
+    const result = await SQLutils.findOneIntersect(pool, table, fields, values);
     return result.length > 0;
 };
 
 const createNewUser = async (newUser) => {
-    const lastUser = await utils.getLastRow(pool, table);
+    const fields = Object.keys(newUser);
+    const values = Object.values(newUser);
 
-    let userId = "000000000";
-
-    if (lastUser) {
-        userId = (parseInt(lastUser["user_id"]) + 1).toString().padStart(9, "0");
-    }
-
-    const { fullname, email, phoneNumber } = newUser;
-    await SQLutils.insert(pool, table, ["user_id", "fullname", "email", "phone"], [userId, fullname, email, phoneNumber]);
+    return await SQLutils.insert(pool, table, fields, values);
 }
 
-const getAllUsers = async () => {
-    return await SQLutils.find(pool, table);
+const getOneUser = async (conditions) => {
+    const fields = Object.keys(conditions);
+    const values = Object.values(conditions);console.log(fields, values);
+
+    return await SQLutils.findOneIntersect(pool, table, fields, values);
 }
 
-const getOneUser = async (fields, values) => {
-    return await SQLutils.findOne(pool, table, fields, values);
+const updateUserInfo = async (info, conditions) => {
+    const fields = Object.keys(info);
+    const values = Object.values(info);
+
+    const conditionFields = Object.keys(conditions);
+    const conditionValues = Object.values(conditions);
+
+    return await SQLutils.updateOne(pool, table, fields, values, conditionFields, conditionValues);
 }
-
-const getUser = async (fields, values) => {
-    return await SQLutils.find(pool, table, fields, values);
-}
-
-const updateUserInfo = async (fields, values, conditionFields, conditionValues) => {
-    await SQLutils.update(pool, table, fields, values, conditionFields, conditionValues);
-}
-
-const checkExistSession = async (sessionId) => {
-  const result = await SQLutils.findOne(pool, sessionTable, ["session_id"], [sessionId]);
-  return result.length > 0;
-};
-
-// const checkPostalCode = async (level, province, district, postal_code) => {
-// 	const successPostalCode = await checkExistAgency(["postal_code"], [postal_code]);
-// 	if (successPostalCode) {
-// 		return new Object({
-// 			success: false,
-// 			message: `Bưu cục/đại lý có mã bưu chính ${postal_code} đã tồn tại.`,
-// 		});
-// 	}
-
-// const getCustomerInfo = async (user_id, user_type) => {
-//     if(user_type === "bussiness_user") {
-//         const query = `SELECT business_name, phone_number FROM business_user WHERE business_id = ?`;
-//         const 
-//     } else if(user_type === "customer_user") {
-
-//     } else {
-//         return new Object({
-//             success: false,
-//             message: `Loại người dùng ${user_type} không tồn tại!`,
-//         });
-//     }
-// }
 
 module.exports = {
     checkExistUser,
     createNewUser,
-    getAllUsers,
-    getUser,
     getOneUser,
     updateUserInfo,
-    checkExistSession,
 }

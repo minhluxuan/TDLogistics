@@ -1,28 +1,91 @@
 {
     "CPN": {
-        "inner_province": {
-            "detail": [
-                {
-                    "from_mass": 0,
-                    "to_mass": 50,
-                    "fee": 8000
-                }
-            ]
-        },
+        "inner_province": [
+            {
+                "from_mass": 0,
+                "to_mass": 50,
+                "fee": 8000 
+            },
+            {
+                "from_mass": 50,
+                "to_mass": 100,
+                "fee": 8500
+            },
+            {
+
+            },
+            {
+                "from_mass": 2000,
+                "to_mass": "INFINITY",
+                "base_fee": 21000,
+                "increment_per_gram": 3400
+            }
+        ],
         "outer_province": {
-            "from_province": "SG",
-            "to_province": "ĐNa",
-            "detail": [
+            "special_case": [
                 {
-                    "from_mass": 0,
-                    "to_mass": 50,
-                    "detail": [
+                    "from_province": "Thành phố Hồ Chí Minh",
+                    "to_province": "Đà Nẵng",
+                    "detail_mass": [
+                        {
+                            "from_mass": 0,
+                            "to_mass": 50,
+                            "fee": 9000
+                        },
+                        {
+                            "from_mass": 50,
+                            "to_mass": 100,
+                            "fee": 13000
+                        },
                         {
 
+                        },
+                        {
+                            "from_mass": 2000,
+                            "to_mass": "INFINITY",
+                            "base_fee": 64100,
+                            "increment_per_gram": 14200
                         }
                     ]
                 }
-            ]
+            ],
+            "ordinary_case": [
+                {
+                    "from_distance": 0,
+                    "to_distance": 100,
+                    "detail_mass": [
+                        {
+                            "from_mass": 0,
+                            "to_mass": 50,
+                            "fee": 8000
+                        },
+                        {
+                            "from_mass": 50,
+                            "to_mass": 100,
+                            "fee": 11800
+                        },
+                        {
+
+                        },
+                        {
+                            "from_mass": 2000,
+                            "to_mass": "INFINITY",
+                            "base_fee": 48400,
+                            "increment_per_gram": 7000
+                        }
+                    ]
+                },
+                {
+
+                },
+                {
+                    "from_distance": "300",
+                    "to_distance": "INFINITY",
+                    "detail_mass": [
+                        
+                    ]
+                }
+            ] 
         }
     }
 }

@@ -5,36 +5,22 @@ const checkExistUser = async (phoneNumber) => {
 }
 
 const createNewUser = async (newUser) => {
-    await Users.createNewUser(newUser);
+    return await Users.createNewUser(newUser);
 }
 
-const getAllUsers = async () => {
-    return await Users.getAllUsers();
+const getOneUser = async (conditions) => {
+    return Users.getOneUser(conditions);
 }
 
-const getOneUser = async (fields, values) => {
-    return Users.getOneUser(fields, values);
+const updateUserInfo = async (info, conditions) => {
+    return await Users.updateUserInfo(info, conditions);
 }
-
-const getUser = async (fields, values) => {
-    return await Users.getUser(fields, values);
-}
-
-const updateUserInfo = async (fields, values, conditionFields, conditionValues) => {
-    await Users.updateUserInfo(fields, values, conditionFields, conditionValues);
-}
-
-const checkExistSession = async (sessionId) => {
- return await Users.checkExistSession(sessionId);
-};
 
 
 module.exports = {
     checkExistUser,
     createNewUser,
-    getAllUsers,
+
     getOneUser,
-    getUser,
     updateUserInfo,
-    checkExistSession,
 }

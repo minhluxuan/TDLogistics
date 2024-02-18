@@ -4,46 +4,60 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const businessController = require("../controllers/businessController");
 const Business = require("../database/Business");
+const auth = require("../lib/auth");
 
 const router = express.Router();
 
 const sessionStrategy = new LocalStrategy({
-    usernameField: "email",
+    usernameField: "username",
     passwordField: "password",
-}, async (email, password, done) => {
-    const businessUser = await Business.getOneBusinessUser(["email"], [email]);
+}, async (username, password, done) => {
+    const resultGettingOneBusiness = await Business.getOneBusinessUser({ username: username });
 
-    if (businessUser.length <= 0) {
+    if (resultGettingOneBusiness.length <= 0) {
+        done(null, false);
+    }
+
+    const business = resultGettingOneBusiness[0];
+
+    if (!business) {
         return done(null, false);
     }
 
-    const passwordFromDatabase = businessUser[0]["password"];
+    const passwordFromDatabase = business.password;
     const match = bcrypt.compareSync(password, passwordFromDatabase);
 
     if (!match) {
         return done(null, false);
     }
 
-    const business_id = businessUser[0]["business_id"];
-    const permission = 1;
+    const business_id = business.business_id;
+    const role = "BUSINESS_USER";
+    const active = business.active;
 
     return done(null, {
         business_id,
-        permission,
+        role,
+        active,
     });
 });
 
 passport.use("businessLogin", sessionStrategy);
 
-router.get("/", businessController.getOneBusinessUser);
-router.post("/login", passport.authenticate("businessLogin", {
-    successRedirect: "/api/v1/business/login_success",
-    failureRedirect: "/api/v1/business/login_fail",
-    failureFlash: true,
-}), businessController.verifyBusinessUserSuccess);
-router.post("/login_success", businessController.verifyBusinessUserSuccess);
-router.post("/login_fail", businessController.verifyBusinessUserFail);
-router.patch("/update_password", businessController.updatePassword);
-router.get("/logout", businessController.logout);
+router.post("/login", passport.authenticate("businessLogin"), (req, res, next) => {
+    passport.authenticate("businessLogin", (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.status(401).json({ error: true, message: "Xác thực thất bại." });
+        }
+
+        return res.status(200).json({ error: false, message: "Xác thực thành công." });
+    })(req, res, next);
+});
+router.get("/", auth.isAuthenticated(), auth.isAuthorized(["BUSINESS_USER"]), auth.isActivated(), businessController.getOneBusinessUser);
+router.patch("/update_password", auth.isAuthenticated(), auth.isAuthorized(["BUSINESS_USER"]), businessController.updatePassword);
+router.get("/logout", auth.isAuthenticated(), auth.isAuthorized(["BUSINESS_USER"]), auth.isActivated(), businessController.logout);
 
 module.exports = router;

@@ -14,8 +14,11 @@ const table = "orders";
 
 const pool = mysql.createPool(dbOptions).promise();
 
-const checkExistOrder = async (order_id) => {
-    const result = await SQLutils.findOne(pool, table, ["order_id"], [order_id]);
+const checkExistOrder = async (conditions) => {
+    const fields = Object.keys(conditions);
+    const values = Object.values(conditions);
+
+    const result = await SQLutils.findOneIntersect(pool, table, fields, values);
     return result.length > 0;
 };
 
@@ -146,33 +149,49 @@ const getProvincePostalCode = async (province) => {
 // AND table_name = 'agency';
 
 const findingManagedAgency = async (ward, district, province) => {
-
-    const postal_code = await getDistrictPostalCode(district, province);
-    if(!postal_code) {
-        throw new Error("Không tìm thấy mã bưu chính!");
-    } 
-    const agencyTable = postal_code + "_orders";
-    const checkAgencyExistQuery = `
-                SELECT COUNT(*) as table_exists
-                FROM information_schema.tables
-                WHERE table_schema = ?
-                AND table_name = ?;`
-    const checkAgencyExist = await pool.query(checkAgencyExistQuery, [process.env.DATABASE, agencyTable]);
-    if(checkAgencyExist[0][0].table_exists === 0) {
-        throw new Error("Không tồn tại bưu cục tại quận/huyện!");
+    const query = `SELECT agency_id FROM ward WHERE ward = ? AND district = ? AND province = ? LIMIT 1`;
+    const result = (await pool.query(query, [ward, district, province]))[0];
+    
+    if (!result || result.length === 0) {
+        return new Object({
+            success: false,
+            message: `${ward}, ${district}, ${province} không tồn tại.`,
+        });
     }
 
-    const table = "ward";
-    const query = `SELECT agency_id FROM ${table} WHERE ward = ? AND district = ? AND province = ?`;
-    const result = await pool.query(query, [ward, district, province]);
-    console.log(result[0][0].agency_id);
-    if(!result[0][0].agency_id) {
-        throw new Error("Không tồn tại bưu cục tại xã/thị trấn!");
+    if (!result[0].agency_id) {
+        const gettingAreaQuery = `SELECT area FROM province WHERE province = ?`;
+        const resultGettingArea = (await pool.query(gettingAreaQuery, [province]))[0];
+
+        if (!resultGettingArea || resultGettingArea.length === 0) {
+            return new Object({
+                success: false,
+                message: `${province} không tồn tại.`,
+            });
+        }
+
+        const area = resultGettingArea[0].area;
+        const areaPostalCode = area.toString().padStart(5, '0');
+        const areaAgencyId = "TD" + '_' + areaPostalCode + '_' + "077165007713";
+
+        return new Object({
+            success: true,
+            existedAgency: false,
+            data: {
+                agency_id: [areaAgencyId, "TD_00000_077204007713"],
+                postal_code: [areaPostalCode, areaAgencyId],
+            }
+        });
     }
-    return {
-        agency_id: result[0][0].agency_id,
-        postal_code: postal_code
-    }
+    
+    return new Object({
+        success: true,
+        existedAgency: true,
+        data: {
+            agency_id: [result[0].agency_id],
+            postal_code: [result[0].postal_code]
+        },
+    });
 }
 
 const createOrderInAgencyTable = async (newOrder, postal_code) => {

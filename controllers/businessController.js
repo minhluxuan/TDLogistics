@@ -4,57 +4,22 @@ const Hash = require("../lib/Hash");
 
 const businessValidation = new Validation.BusinessValidation();
 
-const verifyBusinessUserSuccess = (req, res) => {
-	return res.status(200).json({
-		error: false,
-		valid: true,
-		message: "Xác thực thành công."
-	});
-}
-
-const verifyBusinessUserFail = (req, res) => {
-	return res.status(404).json({
-		error: true,
-		valid: false,
-		message: "Xác thực thất bại. Vui lòng đăng nhập hoặc đăng ký.",
-	});
-}
-
 const getOneBusinessUser = async (req , res) => {
-	if (!req.isAuthenticated() || !req.user.permission === 1) {
-		return res.status(401).json({
-			error: true,
-			message: "Bạn không có quyền truy cập tài nguyên này!",
-		});
-	}
-
 	try {
-		const { error } = businessValidation.validateFindingBusinessByBusiness(req.query);
-
-		if (error) {
-			return res.status(400).json({
-				error: true,
-				message: "Thông tin không hợp lệ.",
-			});
-		}
-
-		if (req.user.business_id !== req.query.business_id) {
-			return res.status(401).json({
-				error: true,
-				message: "Bạn không được phép truy cập tài nguyên này.",
-			});
-		}
-
-		const keys = Object.keys(req.query);
-		const values = Object.values(req.query);
-
-		const result = await businessService.getOneBusinessUser(keys, values);
+		const resultGettingOneBusiness = await businessService.getOneBusinessUser({ business_id: req.user.business_id });
 		
-		delete result[0].password;
+		if (!resultGettingOneBusiness || resultGettingOneBusiness.length <= 0) {
+			return res.status(404).json({
+				error: true,
+				message: `Khách hàng doanh nghiệp có mã khách hàng ${req.user.business_id} chưa tồn tại.`,
+			});
+		}
+		
+		delete resultGettingOneBusiness[0].password;
 
 		return res.status(200).json({
 			error: false,
-			data: result,
+			data: resultGettingOneBusiness,
 			message: "Lấy thông tin thành công.",
 		});
 	} catch (error) {
@@ -66,33 +31,31 @@ const getOneBusinessUser = async (req , res) => {
 };
 
 const updatePassword = async (req, res) => {
-	if (!req.isAuthenticated() || req.user.permission !== 1) {
-		return res.status(401).json({
-			error: true,
-			message: "Bạn không có quyền truy cập tài nguyên này!",
-		});
-	}
-
-	const { error } = businessValidation.validateUpdatePassword(req.body);
-
-	if (error) {
-		return res.status(400).json({
-			error: true,
-			message: "Thông tin không hợp lệ.",
-		});
-	}
-	
-	const hashedNewPassword = Hash.hashPassword(req.body.new_password);
-
 	try {
-		const result = await businessService.updatePassword(["password", "active"], [hashedNewPassword, 1], ["business_id"], [req.user.business_id]) ;
-		
-		if (!result || result[0].affectedRows <= 0) {
-			return res.status(404).json({
+		const { error } = businessValidation.validateUpdatePassword(req.body);
+
+		if (error) {
+			return res.status(400).json({
 				error: true,
-				message: "Bạn không được phép truy cập tài nguyên này.",
+				message: error.message,
 			});
 		}
+	
+		const updatedInfo = new Object({
+			password: Hash.hashPassword(req.body.new_password),
+			active: true,
+		});
+		
+		const resultUpdatingPassword = await businessService.updateBusinessUser(updatedInfo, { business_id: req.user.business_id });
+		
+		if (!resultUpdatingPassword || resultUpdatingPassword.affectedRows <= 0) {
+			return res.status(404).json({
+				error: true,
+				message: `Khách hàng doanh nghiệp có mã doanh nghiệp ${req.user.business_id} không tồn tại.`,
+			});
+		}
+
+		req.user.active = true;
 
 		return res.status(200).json({
 			error: false,
@@ -136,8 +99,6 @@ const logout = async (req, res) => {
 
 module.exports = {
 	getOneBusinessUser,
-	verifyBusinessUserSuccess,
-	verifyBusinessUserFail,
 	updatePassword,
 	logout,
 }

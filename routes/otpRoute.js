@@ -2,7 +2,6 @@ const express = require("express");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const otpController = require("../controllers/otpController");
-const Users = require("../database/Users");
 
 const router = express.Router();
 
@@ -15,32 +14,29 @@ const sessionStrategy = new LocalStrategy({
         return done(null, false);
     }
 
-    const user = await Users.getOneUser(["phone"], [phone_number]);
-
-    let user_id = undefined;
-
-    if (user.length > 0) {
-        user_id = user[0]["user_id"];
-    } 
-
-    const permission = 1;
+    const role = "USER";
 
     return done(null, {
-        user_id,
+        role,
         phone_number,
-        permission,
     });
 });
 
-passport.use(sessionStrategy);
+passport.use("otpLogin", sessionStrategy);
 
 router.post("/send_otp", otpController.createOTP);
-router.post("/verify_otp", passport.authenticate("local", {
-    failureRedirect: "/api/v1/otp/otp_fail",
-    successRedirect: "/api/v1/otp/otp_success",
-    failureFlash: true,
-}), otpController.verifyOTPSuccess);
-router.get("/otp_fail", otpController.verifyOTPFail);
-router.get("/otp_success", otpController.verifyOTPSuccess);
+router.post("/verify_otp", passport.authenticate("otpLogin"), (req, res, next) => {
+    passport.authenticate("otpLogin", (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+
+        if (!user) {
+            return res.status(401).json({ error: true, message: "Xác thực thất bại." });
+        }
+
+        return res.status(200).json({ error: false, message: "Xác thực thành công." });
+    })(req, res, next);
+});
 
 module.exports = router;

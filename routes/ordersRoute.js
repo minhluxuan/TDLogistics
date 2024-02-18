@@ -5,10 +5,10 @@ const router = express.Router();
 
 router.get("/check", ordersController.checkExistOrder);
 router.get("/get_status", ordersController.getOrderStatus);
-router.get("/search_orderid", ordersController.getOrderByOrderID);
-router.get("/search_userid", ordersController.getOrderByUserID);
+router.get("/search_order_id", ordersController.getOrderByOrderID);
+router.get("/search_user_id", ordersController.getOrderByUserID);
 router.post("/create", ordersController.createNewOrder);
-router.post("/calculatefee", ordersController.calculateFee);
+router.post("/calculate_fee", ordersController.calculateFee);
 router.patch("/update", ordersController.updateOrder);
 router.delete("/cancel", ordersController.cancelOrder);
 

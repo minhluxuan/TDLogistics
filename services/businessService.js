@@ -4,11 +4,11 @@ const getOneBusinessUser = async (fields, values) => {
     return await Business.getOneBusinessUser(fields, values);
 }
 
-const updatePassword = async (fields, values, conditionFields, conditionValues) => {
-    return await Business.updatePassword(fields, values, conditionFields, conditionValues);
+const updateBusinessUser = async (info, conditions) => {
+    return await Business.updateBusinessUser(info, conditions);
 }
 
 module.exports = {
-  getOneBusinessUser,
-  updatePassword,
+	getOneBusinessUser,
+	updateBusinessUser,
 }

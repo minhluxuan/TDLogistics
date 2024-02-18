@@ -1,7 +1,7 @@
 const Orders = require("../database/Orders");
 
-const checkExistOrder = async (order_id) => {
-    return Orders.checkExistOrder(order_id);
+const checkExistOrder = async (conditions) => {
+    return Orders.checkExistOrder(conditions);
 };
 
 const getOrdersByUserID = async (user_id, status_code = null) => {

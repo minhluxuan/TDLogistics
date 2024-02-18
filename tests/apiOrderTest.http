@@ -1,20 +1,24 @@
-POST http://localhost:5000/api/v1/orders/create
+POST http://localhost:9000/api/v1/orders/create
 content-type: application/json
 
 {
-    "user_id": "0000001",
     "name_sender": "Tran The Nhan",
-    "phone_sender": "0787919942",
-    "name_reciever": "Nguyen Van B",
-    "phone_reciever": "0787919943",
+    "name_receiver": "Nguyen Van B",
+    "phone_number_receiver": "0787919943",
     "mass": 24,
     "height": 30,
     "width": 25,
     "length": 60,
-    "address_source": "Đường tỉnh 52, tổ 6 Khu phố Hiệp Hòa, Thị trấn Đất Đỏ, Huyện Đất Đỏ, Tỉnh Bà Rịa - Vũng Tàu, Việt Nam",
+    "province_source": "Tỉnh An Giang",
+    "district_source": "Thành phố Long Xuyên",
+    "ward_source": "Phường Mỹ Long",
+    "detail_source": "20 Lý Thái Tổ, Phường Mỹ Long",
     "long_source": 107.271563,
     "lat_source": 10.477812,
-    "address_dest": "20 Lý Thái Tổ, Phường Mỹ Long, Thành phố Long Xuyên, Tỉnh An Giang, Việt Nam",
+    "province_dest": "Tỉnh Bà Rịa - Vũng Tàu",
+    "district_dest": "Huyện Đất Đỏ",
+    "ward_dest": "Thị trấn Đất Đỏ",
+    "detail_dest": "Đường tỉnh 52, tổ 6 Khu phố Hiệp Hòa",
     "long_destination": 105.442062,
     "lat_destination": 10.377187,
     "COD": 32000,

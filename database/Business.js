@@ -13,15 +13,24 @@ const table = "business_user";
 
 const pool = mysql.createPool(dbOptions).promise();
 
-const getOneBusinessUser = async (fields, values) => {
-  	return await SQLutils.findOne(pool, table, fields, values);
+const getOneBusinessUser = async (conditions) => {
+	const fields = Object.keys(conditions);
+	const values = Object.values(conditions);
+
+  	return await SQLutils.findOneIntersect(pool, table, fields, values);
 };
 
-const updatePassword = async (fields, values, conditionFields, conditionValues) => {
-	return await SQLutils.update(pool, table, fields, values, conditionFields, conditionValues);
+const updateBusinessUser = async (info, conditions) => {
+	const fields = Object.keys(info);
+	const values = Object.values(info);
+
+	const conditionFields = Object.keys(conditions);
+	const conditionValues = Object.values(conditions);
+
+	return await SQLutils.updateOne(pool, table, fields, values, conditionFields, conditionValues);
 };
 
 module.exports = {
 	getOneBusinessUser,
-	updatePassword
+	updateBusinessUser,
 }

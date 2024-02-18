@@ -1,7 +1,9 @@
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
 const otpService = require("../services/otpService");
-require("dotenv").config();
+const Validation = require("../lib/Validation");
+
+const OTPValidation = new Validation.OTPValidation();
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -12,6 +14,15 @@ const transporter = nodemailer.createTransport({
 });
 
 const createOTP = async (req, res) => {
+    const { error } = OTPValidation.validateSendingOTP(req.body);
+
+    if (error) {
+        return res.status(400).json({
+            error: true,
+            message: error.message,
+        });
+    }
+
     const { phone_number, email } = req.body;
 
     const otp = randomstring.generate({
@@ -57,25 +68,7 @@ const verifyOTPMiddleware = async (phone_number, otp) => {
     return await otpService.verifyOTP(phone_number, otp);
 }
 
-const verifyOTPFail = (req, res) => {
-    return res.status(200).json({
-        error: false,
-        valid: false,
-        message: "OTP không hợp lệ. Vui lòng thử lại!",
-    });
-}
-
-const verifyOTPSuccess = (req, res) => {
-    return res.status(200).json({
-        error: false,
-        valid: true,
-        message: "Xác thực thành công!",
-    });
-}
-
 module.exports = {
     createOTP,
     verifyOTPMiddleware,
-    verifyOTPFail,
-    verifyOTPSuccess,
 }

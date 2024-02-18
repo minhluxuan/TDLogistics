@@ -1,0 +1,49 @@
+POST http://localhost:9000/api/v1/otp/send_otp
+Content-Type: application/json
+
+{
+    "email": "minh.luxuanhcmut@hcmut.edu.vn",
+    "phone_number": "0981430418"
+}
+
+###
+
+POST http://localhost:9000/api/v1/otp/verify_otp
+Content-Type: application/json
+
+{
+    "phone_number": "0981430418",
+    "otp": 8647
+}
+
+###
+
+POST http://localhost:9000/api/v1/users/create
+Content-Type: application/json
+
+{
+    "fullname": "Lữ Xuân Minh",
+    "email": "minh.luxuanhcmut@hcmut.edu.vn",
+    "phone_number": "0981430418"
+}
+
+###
+
+PUT http://localhost:9000/api/v1/users/update
+Content-Type: application/json
+
+{
+    "address": "KTX khu A"
+}
+
+###
+
+GET http://localhost:9000/api/v1/users
+
+###
+
+GET http://localhost:9000/get_session
+
+###
+
+GET http://localhost:9000/api/v1/users/logout

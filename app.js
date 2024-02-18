@@ -10,7 +10,7 @@ const cron = require("cron");
 const cors = require("cors");
 const flash = require("express-flash");
 const passport = require("passport");
-const Auth = require("./lib/Auth");
+const auth = require("./lib/auth");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -99,9 +99,9 @@ app.get("/destroy_session", (req, res) => {
 	});
 });
 
-passport.serializeUser(Auth.setSession);
+passport.serializeUser(auth.setSession);
 passport.deserializeUser((user, done) => {
-    Auth.verifyPermission(user, done);
+    auth.verifyPermission(user, done);
 });
 
 // catch 404 and forward to error handler
@@ -129,7 +129,10 @@ const cleanUpExpiredSession = new cron.CronJob("0 */12 * * *", async () => {
 	  	console.log("Error cleaning up expired session: ", err);
 	}
 });
-  
+
+// const query = `CREATE TABLE 00009_orders AS SELECT * FROM orders WHERE 1 = 0`;
+// pool.query(query);
+
 cleanUpExpiredSession.start();
 
 module.exports = app;
