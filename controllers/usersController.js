@@ -1,5 +1,5 @@
 const usersService = require("../services/usersService");
-const Validation = require("../lib/validation");
+const Validation = require("../lib/Validation2");
 
 const UserValidation = new Validation.UserValidation();
 

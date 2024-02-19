@@ -2,7 +2,7 @@ const moment = require("moment");
 const fs = require("fs");
 const path = require("path");
 const complaintsService = require("../services/complaintsService");
-const Validation = require("../lib/validation");
+const Validation = require("../lib/Validation2");
 
 
 const complaintValidation = new Validation.ComplaintValidation();

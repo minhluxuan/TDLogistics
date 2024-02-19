@@ -1,7 +1,7 @@
 const mysql = require("mysql2");
 const moment = require("moment");
 const SQLutils = require("../lib/dbUtils");
-const libMap = require("../lib/map");
+const libMap = require("../lib/Map2");
 const dbOptions = {
     host: process.env.HOST,
     port: process.env.DBPOST,
