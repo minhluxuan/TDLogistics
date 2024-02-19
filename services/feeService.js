@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const data = JSON.parse(fs.readFileSync("../lib/fee.json", "utf-8"));
+const data = JSON.parse(fs.readFileSync("./lib/fee.json", "utf-8"));
 
 const calculteFee = (serviceCode, source, destination, distance, mass, increasingRateWhenBelongToRemoteArea, isBelongToRemoteArea = false) => {
     let resultFee = 0;
@@ -8,11 +8,12 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
         if (source === destination) {
             for (const rangeMass of data.CPN.inner_province) {
                 if (rangeMass.to_mass === "INFINITY") {
-                    resultFee = rangeMass.base_fee + (mass - rangeMass.from_mass) * rangeMass.increment_per_gram;
+                    resultFee = rangeMass.base_fee +((mass - rangeMass.from_mass)/500)* rangeMass.increment_per_kilogram;
                 }
 
                 if (mass > rangeMass.from_mass && mass <= rangeMass.to_mass) {
                     resultFee = rangeMass.fee;
+
                 }
             }
         }
@@ -21,7 +22,7 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
                 if (source === location.from_province && destination === location.to_province) {
                     for (const rangeMass of location.detail_mass) {
                         if (rangeMass.to_mass === "INFINITY") {
-                            resultFee = rangeMass.base_fee + (mass - rangeMass.from_mass) * rangeMass.increment_per_gram;
+                            resultFee = rangeMass.base_fee + ((mass - rangeMass.from_mass)/500) * rangeMass.increment_per_kilogram;
                         }
         
                         if (mass > rangeMass.from_mass && mass <= rangeMass.to_mass) {
@@ -35,7 +36,7 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
                 if (rangeDistance.to_distance === "INFINITY") {
                     for (const rangeMass of rangeDistance.detail_mass) {
                         if (rangeMass.to_mass === "INFINITY") {
-                            resultFee = rangeMass.base_fee + (mass - rangeMass.from_mass) * rangeMass.increment_per_gram;
+                            resultFee = rangeMass.base_fee + ((mass - rangeMass.from_mass)/500) * rangeMass.increment_per_gram;
                         }
         
                         if (mass > rangeMass.from_mass && mass <= rangeMass.to_mass) {
@@ -47,7 +48,7 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
                 if (distance > rangeDistance.from_distance && distance <= rangeDistance.to_distance) {
                     for (const rangeMass of rangeDistance.detail_mass) {
                         if (rangeMass.to_mass === "INFINITY") {
-                            resultFee = rangeMass.base_fee + (mass - rangeMass.from_mass) * rangeMass.increment_per_gram;
+                            resultFee = rangeMass.base_fee + ((mass - rangeMass.from_mass)/500) * rangeMass.increment_per_gram;
                         }
         
                         if (mass > rangeMass.from_mass && mass <= rangeMass.to_mass) {
@@ -61,3 +62,5 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
 
     return isBelongToRemoteArea ? resultFee * (1 + increasingRateWhenBelongToRemoteArea) : resultFee;
 }
+
+console.log(calculteFee("CPN", "Hà Nội", "Hà Nội", 25, 10000, 0))
