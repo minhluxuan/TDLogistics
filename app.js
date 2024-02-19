@@ -10,7 +10,7 @@ const cron = require("cron");
 const cors = require("cors");
 const flash = require("express-flash");
 const passport = require("passport");
-const auth = require("./lib/auth");
+const auth = require("./lib/Auth");
 const dotenv = require("dotenv");
 dotenv.config();
 
