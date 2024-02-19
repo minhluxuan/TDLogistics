@@ -4,7 +4,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const businessController = require("../controllers/businessController");
 const Business = require("../database/Business");
-const auth = require("../lib/auth");
+const auth = require("../lib/auth2");
 
 const router = express.Router();
 
