@@ -5,7 +5,7 @@ const sizeOf = require("image-size");
 // const imageType = require("image-type");
 
 const complaintsController = require("../controllers/complaintsController");
-const Auth = require("../lib/auth2");
+const Auth = require("../lib/auth");
 
 const storage = multer.diskStorage({
     destination: function (req, file, done) {
