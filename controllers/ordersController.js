@@ -11,7 +11,10 @@ eventManager.once("ioInitialize", (io) => {
     });
     // Thiết lập trình xử lý sự kiện 'connection' và 'disconnect' trong io
     io.on("connection", (socket) => {
+        const user = socket.request.user;
         console.log("Socket connected with ID: ", socket.id);
+        console.log(user);
+        
         socket.on("disconnect", () => {
             console.log("Socket disconnected with ID: ", socket.id);
         });
@@ -31,7 +34,7 @@ const checkExistOrder = async (req, res) => {
             error: false, 
             existed: existed,
             message: existed ? `Đơn hàng có mã ${req.query.order_id} đã tồn tại.` : `Đơn hàng có mã ${req.query.order_id} không tồn tại.`,
-        }); 
+        });
     }
     catch (error) {
         return res.status(500).json({

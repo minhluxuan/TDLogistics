@@ -1,0 +1,10 @@
+doctype html 
+html 
+    head 
+        title Login 
+    body 
+        form(action="/api/v1/otp/verify_otp", method="POST")
+            input#phone_number(type="text", placeholder="Phone Number", name="phone_number")
+            input#otp(type="text", placeholder="OTP", name="otp")
+            input#submit(type="submit", value="Submit")
+        
