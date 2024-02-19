@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
 const otpService = require("../services/otpService");
-const Validation = require("../lib/Validation2");
+const Validation = require("../lib/validation");
 
 const OTPValidation = new Validation.OTPValidation();
 

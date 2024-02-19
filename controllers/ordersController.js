@@ -1,8 +1,8 @@
 const moment = require("moment");
 const ordersService = require("../services/ordersService");
-const Validation = require("../lib/Validation2");
+const Validation = require("../lib/validation");
 const servicesFee = require("../lib/servicesFee");
-const libMap = require("../lib/Map2");
+const libMap = require("../lib/map");
 const eventManager = require("../lib/eventManager");
 
 eventManager.once("ioInitialize", (io) => {
