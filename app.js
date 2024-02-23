@@ -10,7 +10,7 @@ const cron = require("cron");
 const cors = require("cors");
 const flash = require("express-flash");
 const passport = require("passport");
-const auth = require("./lib/auth");
+const auth = require("./lib/Auth");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -40,7 +40,20 @@ app.set('view engine', 'jade');
 app.enable('trust proxy');
 
 // Chỉ định danh sách các trang web được phép truy cập
-const allowedOrigins = ['https://customer-merchant-web.vercel.app', 'https://testwebmerchant.vercel.app'];
+const allowedOrigins = ["https://copyprogramming.com", 'https://customer-merchant-web.vercel.app', 'https://testwebmerchant.vercel.app', "http://127.0.0.1:5500"];
+
+const sessionMiddleware = session({
+	secret: process.env.SESSION_SECRET,
+	resave: false,
+	saveUninitialized: false,
+	store: sessionStore,
+	cookie: {
+		secure: true,
+		sameSite: 'None',
+		httpOnly: false,
+		maxAge: 15 * 60 * 1000,
+	}
+});
 
 // Sử dụng cors middleware với tùy chọn chỉ cho phép các trang web trong danh sách
 app.use(cors({
@@ -55,23 +68,13 @@ app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 }));
+// app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-	secret: process.env.SESSION_SECRET,
-	resave: false,
-	saveUninitialized: false,
-	store: sessionStore,
-	cookie: {
-		secure: false,
-		sameSite: 'None',
-		httpOnly: false,
-		maxAge: 15 * 60 * 1000,
-	}
-}));
+app.use(sessionMiddleware);
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -135,4 +138,7 @@ const cleanUpExpiredSession = new cron.CronJob("0 */12 * * *", async () => {
 
 cleanUpExpiredSession.start();
 
-module.exports = app;
+module.exports = {
+	app,
+	sessionMiddleware
+};

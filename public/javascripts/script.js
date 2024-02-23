@@ -1,4 +1,4 @@
-const socket = io("http://localhost:5000");
+const socket = io("http://localhost:9000");
 const notificationArea = document.querySelector("#notificationArea");
 
 socket.on("notifyNewOrder", (order) => {

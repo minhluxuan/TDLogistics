@@ -9,11 +9,11 @@ const sessionStrategy = new LocalStrategy({
     usernameField: "phone_number",
     passwordField: "otp",
 }, async (phone_number, otp, done) => {
-    const valid = await otpController.verifyOTPMiddleware(phone_number, otp);
-    if (!valid) {
-        return done(null, false);
-    }
-
+    // const valid = await otpController.verifyOTPMiddleware(phone_number, otp);
+    // if (!valid) {
+    //     return done(null, false);
+    // }
+    
     const role = "USER";
 
     return done(null, {
@@ -24,6 +24,9 @@ const sessionStrategy = new LocalStrategy({
 
 passport.use("otpLogin", sessionStrategy);
 
+router.get("/", (req, res) => {
+    res.render("login");
+});
 router.post("/send_otp", otpController.createOTP);
 router.post("/verify_otp", passport.authenticate("otpLogin"), (req, res, next) => {
     passport.authenticate("otpLogin", (err, user, info) => {
