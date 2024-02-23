@@ -1,4 +1,5 @@
 {
+  "TTK": {
     "NORTH_AREA": [
       "Lai Châu",
       "Lào Cai",
@@ -15,7 +16,7 @@
       "Bắc Giang",
       "Thái Nguyên",
       "Vĩnh Phúc",
-      " Bắc Ninh",
+      "Bắc Ninh",
       "Hòa Bình",
       "Hải Dương",
       "Hà Nam",
@@ -58,7 +59,7 @@
       "Tiền Giang",
       "Tây Ninh",
       "Bà Rịa-Vũng Tàu",
-      "TP. Hồ Chí Minh",
+      "TP.Hồ Chí Minh",
       "Trà Vinh",
       "Vĩnh Long",
       "An Giang",
@@ -70,4 +71,77 @@
       "Kiên Giang",
       "Sóc Trăng"
     ]
+  },
+
+  "HTT": {
+    "HN": ["Hà Nội"],
+
+    "HCM": ["TP.Hồ Chí Minh"],
+
+    "DN": ["Đà Nẵng"],
+
+    "HN_OUTER": [
+      "Vĩnh Phúc",
+      "Thái Nguyên",
+      "Bắc Ninh",
+      "Hưng Yên",
+      "Hải Dương",
+      "Hải Phòng",
+      "Hà Nam",
+      "Nam Định",
+      "Thái Bình",
+      "Ninh Bình",
+      "Hòa Bình"
+    ],
+
+    "HCM_OUTER": [
+      "Đồng Nai",
+      "Bình Dương",
+      "Bà Rịa - Vũng Tàu",
+      "Tây Ninh",
+      "Long An",
+      "Bến Tre"
+    ],
+
+    "FLIGHTSTRAIGHT_TO_HN_AND_OUTER": [
+      "Nghệ An",
+      "Quảng Bình",
+      "Thừa Thiên - Huế",
+      "Bình Định",
+      "Khánh Hòa",
+      "Phú Yên",
+      "Gia Lai",
+      "Đăk Lăk",
+      "Lâm Đồng",
+      "Cần Thơ",
+      "Kiên Giang",
+      "Bà Rịa - Vũng Tàu"
+    ],
+
+    "FLIGHTSTRAIGHT_TO_HCM_AND_OUTER": [
+      "Nghệ An",
+      "Quảng Bình",
+      "Thừa Thiên- Huế",
+      "Bình Định",
+      "Khánh Hòa",
+      "Phú Yên",
+      "Gia Lai",
+      "Đăk Lăk",
+      "Lâm Đồng",
+      "Cần Thơ",
+      "Cà Mau",
+      "Kiên Giang",
+      "Côn Đảo-BRVT",
+      "Hải Phòng",
+      "Quảng Ninh"
+    ],
+
+    "FLIGHTSTRAIGHT_TO_DN_AND_OUTER": [
+      "Lâm Đồng",
+      "Nghệ An",
+      "Cần Thơ",
+      "Hải Phòng",
+      "Khánh Hòa"
+    ]
+  }
 }
