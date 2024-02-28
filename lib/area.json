@@ -1,4 +1,47 @@
 {
+  "CPN": {
+    "T60": [
+      "Hà Nội",
+      "Quảng Ninh",
+      "Thái Bình",
+      "Ninh Bình",
+      "Nam Định",
+      "Hải Dương",
+      "Hải Phòng",
+      "Hưng Yên",
+      "Bắc Ninh",
+      "Hà Nam",
+      "Vĩnh Phúc",
+      "Phú Thọ",
+      "Thái Nguyên",
+      "Bắc Giang",
+      "Thanh Hóa",
+      "Nghệ An",
+      "Hà Tĩnh",
+      "Đà Nẵng",
+      "Thừa Thiên-Huế",
+      "Quảng Bình",
+      "Quảng Trị",
+      "Quảng Nam",
+      "Quảng Ngãi",
+      "Gia Lai",
+      "Kon Tum",
+      "Bình Định",
+      "Phú Yên",
+      "Khánh Hòa",
+      "Ninh Thuận",
+      "Bình Thuận",
+      "Đồng Nai",
+      "Bình Dương",
+      "Bà Rịa-Vũng Tàu",
+      "Hồ Chí Minh",
+      "Long An",
+      "Tiền Giang",
+      "Tây Ninh"
+    ]
+
+  },
+
   "TTK": {
     "NORTH_AREA": [
       "Lai Châu",
@@ -101,47 +144,6 @@
       "Tây Ninh",
       "Long An",
       "Bến Tre"
-    ],
-
-    "FLIGHTSTRAIGHT_TO_HN_AND_OUTER": [
-      "Nghệ An",
-      "Quảng Bình",
-      "Thừa Thiên - Huế",
-      "Bình Định",
-      "Khánh Hòa",
-      "Phú Yên",
-      "Gia Lai",
-      "Đăk Lăk",
-      "Lâm Đồng",
-      "Cần Thơ",
-      "Kiên Giang",
-      "Bà Rịa - Vũng Tàu"
-    ],
-
-    "FLIGHTSTRAIGHT_TO_HCM_AND_OUTER": [
-      "Nghệ An",
-      "Quảng Bình",
-      "Thừa Thiên- Huế",
-      "Bình Định",
-      "Khánh Hòa",
-      "Phú Yên",
-      "Gia Lai",
-      "Đăk Lăk",
-      "Lâm Đồng",
-      "Cần Thơ",
-      "Cà Mau",
-      "Kiên Giang",
-      "Côn Đảo-BRVT",
-      "Hải Phòng",
-      "Quảng Ninh"
-    ],
-
-    "FLIGHTSTRAIGHT_TO_DN_AND_OUTER": [
-      "Lâm Đồng",
-      "Nghệ An",
-      "Cần Thơ",
-      "Hải Phòng",
-      "Khánh Hòa"
     ]
   }
 }

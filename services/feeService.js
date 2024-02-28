@@ -3,13 +3,15 @@ const fs = require("fs");
 const area = JSON.parse(fs.readFileSync("./lib/area.json", "utf-8"));
 const data = JSON.parse(fs.readFileSync("./lib/fee.json", "utf-8"));
 
-const calculteFee = (serviceCode, source, destination, distance, mass, increasingRateWhenBelongToRemoteArea, isBelongToRemoteArea = false) => {
+const calculteFee = (serviceCode, source, destination, distance, mass, increasingRateWhenBelongToRemoteArea, optionService = null, isBelongToRemoteArea = false) => {
+    const transferService = data.CPN;
     let resultFee = 0;
+    let areaService = area.CPN;
     if (serviceCode === "CPN") {
         if (source === destination) {
-            for (const rangeMass of data.CPN.inner_province) {
+            for (const rangeMass of transferService.inner_province) {
                 if (rangeMass.to_mass === "INFINITY") {
-                    resultFee = rangeMass.base_fee + Math.floor((mass - rangeMass.from_mass)/500)* rangeMass.increment_per_kilogram;
+                    resultFee = rangeMass.base_fee + Math.ceil((mass - rangeMass.from_mass)/transferService.block_step_incre)* rangeMass.increment_per_kilogram;
                 }
 
                 if (mass > rangeMass.from_mass && mass <= rangeMass.to_mass) {
@@ -19,11 +21,11 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
             }
         }
         else {
-            for (const location of data.CPN.outer_province.special_case) {
+            for (const location of transferService.outer_province.special_case) {
                 if (source === location.from_province && destination === location.to_province) {
                     for (const rangeMass of location.detail_mass) {
                         if (rangeMass.to_mass === "INFINITY") {
-                            resultFee = rangeMass.base_fee + Math.floor((mass - rangeMass.from_mass)/500) * rangeMass.increment_per_kilogram;
+                            resultFee = rangeMass.base_fee + Math.ceil((mass - rangeMass.from_mass)/transferService.block_step_incre) * rangeMass.increment_per_kilogram;
                         }
         
                         if (mass > rangeMass.from_mass && mass <= rangeMass.to_mass) {
@@ -34,11 +36,11 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
                 }
             }
 
-            for (const rangeDistance of data.CPN.outer_province.ordinary_case) {
+            for (const rangeDistance of transferService.outer_province.ordinary_case) {
                 if (rangeDistance.to_distance === "INFINITY") {
                     for (const rangeMass of rangeDistance.detail_mass) {
                         if (rangeMass.to_mass === "INFINITY") {
-                            resultFee = rangeMass.base_fee + Math.floor((mass - rangeMass.from_mass)/500) * rangeMass.increment_per_gram;
+                            resultFee = rangeMass.base_fee + Math.ceil((mass - rangeMass.from_mass)/transferService.block_step_incre) * rangeMass.increment_per_gram;
                         }
         
                         if (mass > rangeMass.from_mass && mass <= rangeMass.to_mass) {
@@ -51,7 +53,7 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
                 if (distance > rangeDistance.from_distance && distance <= rangeDistance.to_distance) {
                     for (const rangeMass of rangeDistance.detail_mass) {
                         if (rangeMass.to_mass === "INFINITY") {
-                            resultFee = rangeMass.base_fee + Math.floor((mass - rangeMass.from_mass)/500) * rangeMass.increment_per_gram;
+                            resultFee = rangeMass.base_fee + Math.ceil((mass - rangeMass.from_mass)/transferService.block_step_incre) * rangeMass.increment_per_gram;
                         }
         
                         if (mass > rangeMass.from_mass && mass <= rangeMass.to_mass) {
@@ -60,6 +62,14 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
                         }
                     }
                 }
+            }
+        }
+
+        if (optionService === "T60")
+        {
+            if (areaService[optionService].includes(destination) && areaService[optionService].includes(source)) 
+            {
+                resultFee = resultFee * (1 - transferService.optionService.feeRate/100) ;
             }
         }
     }
@@ -85,11 +95,12 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
             for (const rangeMass of transferService["INNER_AREA"]) {
                 if (rangeMass.hasOwnProperty("increme_per_kilogram")) {
                     let increamentfee;
-                    let incremass = Math.floor((mass - 2000)/1000);
+                    // let incremass = Math.ceil((mass - 2000)/1000);
                     for (const rangeMassIncre of rangeMass.increme_per_kilogram.increme_fee)
                     {
+                        let incremass = mass - rangeMassIncre.from_mass;
                         if (incremass >= rangeMassIncre.from_mass && incremass < rangeMassIncre.to_mass) {
-                            increamentfee = incremass * rangeMassIncre.fee;
+                            increamentfee =Math.ceil(incremass/transferService.block_step_incre)  * rangeMassIncre.fee;
                             break;
                         }
 
@@ -111,13 +122,14 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
         else if (sourceArea === "NORTH_AREA" && desArea === "MIDDLE_AREA" || desArea === "NORTH_AREA" && sourceArea === "MIDDLE_AREA" 
         || sourceArea === "SOUTH_AREA" && desArea === "MIDDLE_AREA" || desArea === "SOUTH_AREA"  && sourceArea === "MIDDLE_AREA"){
             for (const rangeMass of transferService["OUTER_AREA"]) {
+
                 if (rangeMass.hasOwnProperty("increme_per_kilogram")) {
                     let increamentfee;
-                    let incremass = Math.floor((mass - 2000)/1000);
                     for (const rangeMassIncre of rangeMass.increme_per_kilogram.increme_fee)
                     {
+                        let incremass =  mass - rangeMassIncre.from_mass;
                         if (incremass >= rangeMassIncre.from_mass && incremass < rangeMassIncre.to_mass) {
-                            increamentfee = incremass * rangeMassIncre.fee;
+                            increamentfee =Math.ceil(incremass/transferService.block_step_incre)  * rangeMassIncre.fee;
                             break;
                         }
 
@@ -138,11 +150,11 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
             for (const rangeMass of transferService["SEPERATE_AREA"]) {
                 if (rangeMass.hasOwnProperty("increme_per_kilogram")) {
                     let increamentfee;
-                    let incremass = Math.floor((mass - 2000)/1000) ;
                     for (const rangeMassIncre of rangeMass.increme_per_kilogram.increme_fee)
                     {
+                        let incremass = mass - rangeMassIncre.from_mass;
                         if (incremass >= rangeMassIncre.from_mass && incremass < rangeMassIncre.to_mass) {
-                            increamentfee = incremass * rangeMassIncre.fee;
+                            increamentfee =Math.ceil(incremass/transferService.block_step_incre)  * rangeMassIncre.fee;
                             break;
                         }
 
@@ -162,8 +174,8 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
     }
 
     if (serviceCode === "HTT") {
-        let sourceArea;
-        let desArea;
+        let sourceArea ;
+        let desArea ;
         const areService = area.HTT;
         for (const range in areService) 
         {   
@@ -174,50 +186,73 @@ const calculteFee = (serviceCode, source, destination, distance, mass, increasin
             }
         }
 
-        if (desArea === "HN" || desArea === "HN_OUTER")
+        for (const range in areService)
         {
-            if (areService["FLIGHTSTRAIGHT_TO_HN_AND_OUTER"].includes(source))
+            if (areService[range].includes(source) )
             {
-                sourceArea = "FLIGHTSTRAIGHT_TO_HN_AND_OUTER";
+                sourceArea = range;
+                break;
             }
         }
-        else if (desArea === "HCM" || desArea === "HCM_OUTER")
-        {
-            if (areService["FLIGHTSTRAIGHT_TO_HCM_AND_OUTER"].includes(source))
-            {
-                sourceArea = "FLIGHTSTRAIGHT_TO_HCM_AND_OUTER";
-            }
-        }
-        else if (desArea === "DN" )
-        {
-            if (areService["FLIGHTSTRAIGHT_TO_DN_AND_OUTER"].includes(source))
-            {
-                sourceArea = "FLIGHTSTRAIGHT_TO_DN_AND_OUTER";
-            }
-        }
-
+        
         if (sourceArea === undefined)
         {
-            for (const range in areService) 
-            {
-                if (areService[range].includes(source) )
-                {
-                    sourceArea = range;
-                    break;
-                }
-            }
+            sourceArea = "FLIGHTSTRAIGHT";
+        }
+
+        if (desArea === undefined)
+        {
+            desArea = "FLIGHTSTRAIGHT";
         }
 
         const transferService = data.HTT;
-        for (const rangeMass of transferService[desArea][sourceArea]) {
-            if (rangeMass.to_mass === "INFINITY") {
-                resultFee = rangeMass.base_fee + Math.floor((mass - rangeMass.from_mass)/500)* rangeMass.increment_per_kilogram;
+        for (const rangeMass of transferService[sourceArea][desArea]) 
+        {
+            if (desArea === "FLIGHTSTRAIGHT")
+            {
+                if (rangeMass.to_distance === "INFINITY")
+                {
+                    for (const rangeMassHT in rangeMass.detail_mass)
+                    {
+                        if (rangeMassHT.to_mass === "INFINITY") {
+                            resultFee = rangeMassHT.base_fee + Math.ceil((mass - rangeMassHT.from_mass)/transferService.block_step_incre) * rangeMass.increment_per_kilogram;
+                        }
+            
+                        if (mass >= rangeMassHT.from_mass && mass < rangeMassHT.to_mass) {
+                            resultFee = rangeMassHT.fee;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                else if ( distance >= rangeMass.from_distance && distance < rangeMass.to_distance)
+                {
+                    for (const rangeMassHT in rangeMass.detail_mass)
+                    {
+                        if (rangeMassHT.to_mass === "INFINITY") {
+                            resultFee = rangeMassHT.base_fee + Math.ceil((mass - rangeMassHT.from_mass)/transferService.block_step_incre) * rangeMass.increment_per_kilogram;
+                        }
+            
+                        if (mass >= rangeMassHT.from_mass && mass < rangeMassHT.to_mass) {
+                            resultFee = rangeMassHT.fee;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            else 
+            {
+                if (rangeMass.to_mass === "INFINITY") {
+                    resultFee = rangeMass.base_fee + Math.ceil((mass - rangeMass.from_mass)/transferService.block_step_incre) * rangeMass.increment_per_kilogram;
+                }
+    
+                if (mass >= rangeMass.from_mass && mass < rangeMass.to_mass) {
+                    resultFee = rangeMass.fee;
+                    break;
+                }
             }
 
-            if (mass >= rangeMass.from_mass && mass < rangeMass.to_mass) {
-                resultFee = rangeMass.fee;
-                break;
-            }
         }
     }
     return isBelongToRemoteArea ? resultFee * (1 + increasingRateWhenBelongToRemoteArea) : resultFee;
